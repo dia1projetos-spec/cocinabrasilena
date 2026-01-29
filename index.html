@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Cocina Brasileña - Los mejores sabores de Brasil en Argentina">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Cocina Brasileña - Sabores Auténticos</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css?v=1.0.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Righteous&display=swap" rel="stylesheet">
@@ -42,9 +45,9 @@
                     </div>
                     
                     <ul class="nav-menu" id="navMenu">
-                        <li><a href="#inicio" class="nav-link active">Inicio</a></li>
+                        <li><a href="#menu" class="nav-link active">Menú</a></li>
                         <li><a href="#sobre" class="nav-link">Sobre Nosotros</a></li>
-                        <li><a href="#menu" class="nav-link">Menú</a></li>
+                        <li><a href="#inicio" class="nav-link">Inicio</a></li>
                         <li><a href="#contacto" class="nav-link">Contacto</a></li>
                     </ul>
                     
@@ -64,57 +67,55 @@
         </nav>
     </header>
 
-    <!-- Hero Section -->
-    <section id="inicio" class="hero">
-        <div class="hero-bg"></div>
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <h1 class="hero-title">
-                        <span class="title-accent">Sabores Auténticos</span>
-                        <span class="title-main">de Brasil</span>
-                    </h1>
-                    <p class="hero-subtitle">
-                        Experimentá la verdadera cocina brasileña en el corazón de Argentina. 
-                        Cada plato es una celebración de sabores, colores y tradición.
-                    </p>
-                    <div class="hero-buttons">
-                        <a href="#menu" class="btn btn-primary">
-                            <span>Ver Menú</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <a href="https://wa.me/5513981763452" class="btn btn-secondary" target="_blank">
-                            <i class="fab fa-whatsapp"></i>
-                            <span>Pedí Ahora</span>
-                        </a>
+    <!-- Menu Section -->
+    <section id="menu" class="menu menu-first">
+        <div class="menu-hero">
+            <div class="container">
+                <div class="menu-hero-content">
+                    <div class="menu-hero-text">
+                        <h1 class="menu-hero-title">
+                            <span class="title-accent">Sabores Auténticos</span>
+                            <span class="title-main">de Brasil</span>
+                        </h1>
+                        <p class="menu-hero-subtitle">
+                            Descubrí nuestra selección de platos tradicionales brasileños. 
+                            Cada receta cuenta una historia de tradición y sabor.
+                        </p>
                     </div>
-                    <div class="hero-stats">
-                        <div class="stat-item">
-                            <div class="stat-number">5+</div>
-                            <div class="stat-label">Años de Experiencia</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">50+</div>
-                            <div class="stat-label">Platos Auténticos</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">1000+</div>
-                            <div class="stat-label">Clientes Felices</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="hero-image">
-                    <div class="mascot-container">
-                        <img src="images/mascote.jpg" alt="Mascote Cocina Brasileña" class="mascot">
-                        <div class="mascot-decoration"></div>
+                    <div class="menu-hero-mascot">
+                        <img src="images/mascote.jpg" alt="Cocina Brasileña" class="mascot-image">
                     </div>
                 </div>
             </div>
         </div>
-        <div class="hero-wave">
-            <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
-            </svg>
+        
+        <div class="container">
+            <div class="menu-filters">
+                <button class="filter-btn active" data-category="todos">
+                    <i class="fas fa-globe"></i>
+                    <span>Todos</span>
+                </button>
+                <button class="filter-btn" data-category="principales">
+                    <i class="fas fa-drumstick-bite"></i>
+                    <span>Principales</span>
+                </button>
+                <button class="filter-btn" data-category="acompañamientos">
+                    <i class="fas fa-seedling"></i>
+                    <span>Acompañamientos</span>
+                </button>
+                <button class="filter-btn" data-category="bebidas">
+                    <i class="fas fa-glass-cheers"></i>
+                    <span>Bebidas</span>
+                </button>
+                <button class="filter-btn" data-category="postres">
+                    <i class="fas fa-ice-cream"></i>
+                    <span>Postres</span>
+                </button>
+            </div>
+
+            <div class="menu-grid" id="menuGrid">
+                <!-- Menu items will be dynamically loaded here -->
+            </div>
         </div>
     </section>
 
@@ -159,42 +160,38 @@
         </div>
     </section>
 
-    <!-- Menu Section -->
-    <section id="menu" class="menu">
+    <!-- Hero Stats Section -->
+    <section id="inicio" class="hero-stats-section">
         <div class="container">
-            <div class="section-header">
-                <span class="section-tag">Nuestro Menú</span>
-                <h2 class="section-title">Descubrí Nuestros Platos</h2>
-                <p class="section-subtitle">
-                    Una selección especial de los mejores sabores de la cocina brasileña
-                </p>
-            </div>
-
-            <div class="menu-filters">
-                <button class="filter-btn active" data-category="todos">
-                    <i class="fas fa-globe"></i>
-                    <span>Todos</span>
-                </button>
-                <button class="filter-btn" data-category="principales">
-                    <i class="fas fa-drumstick-bite"></i>
-                    <span>Principales</span>
-                </button>
-                <button class="filter-btn" data-category="acompañamientos">
-                    <i class="fas fa-seedling"></i>
-                    <span>Acompañamientos</span>
-                </button>
-                <button class="filter-btn" data-category="bebidas">
-                    <i class="fas fa-glass-cheers"></i>
-                    <span>Bebidas</span>
-                </button>
-                <button class="filter-btn" data-category="postres">
-                    <i class="fas fa-ice-cream"></i>
-                    <span>Postres</span>
-                </button>
-            </div>
-
-            <div class="menu-grid" id="menuGrid">
-                <!-- Menu items will be dynamically loaded here -->
+            <div class="hero-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <div class="stat-number">5+</div>
+                    <div class="stat-label">Años de Experiencia</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Platos Auténticos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-smile"></i>
+                    </div>
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">Clientes Felices</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-number">4.9</div>
+                    <div class="stat-label">Calificación Promedio</div>
+                </div>
             </div>
         </div>
     </section>
@@ -426,8 +423,8 @@
         </div>
     </div>
 
-    <script src="js/menu-data.js"></script>
-    <script src="js/cart.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/menu-data.js?v=1.0.0"></script>
+    <script src="js/cart.js?v=1.0.0"></script>
+    <script src="js/main.js?v=1.0.0"></script>
 </body>
 </html>
