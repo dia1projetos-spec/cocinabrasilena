@@ -41,12 +41,22 @@ const menuData = [
     },
 
     {
-        id: 9,
+        id: 10,
         name: "3 Estrellas rellenas + Mini Coca-Cola",
         category: "Combos",
         price: 5500,
         description: "Estrella rellena con un delicioso puré de papas, queso cremoso y un toque de orégano + Una Mini-Coca",
         image: "images/tresestrellasycoca.jpeg",
+        popular: false
+    },
+
+    {
+        id: 11,
+        name: "Copo de Maraviilas + Milshake Alcohólico de Durazno",
+        category: "Combos",
+        price: 8000,
+        description: "Un Combo Perfecto",
+        image: "images/milkshakeyaravilla.jpg",
         popular: false
     },
    
@@ -61,6 +71,17 @@ const menuData = [
         image: "images/caipirinha.png   ",
         popular: true,
         badge: "Clásico"
+    },
+
+    {
+        id: 16,
+        name: "Milkshake Alcohólico de Durazno",
+        category: "bebidas",
+        price: 5000,
+        description: "Rica bebida hecha con leche, vodka y durazno",
+        image: "images/milkshake de durazno.png   ",
+        popular: true,
+        badge: "Novedad"
     },
     
 
