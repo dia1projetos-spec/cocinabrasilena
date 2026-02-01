@@ -79,7 +79,7 @@ const menuData = [
         category: "bebidas",
         price: 5000,
         description: "Rica bebida hecha con leche, vodka y durazno",
-        image: "images/milkshake de durazno.png   ",
+        image: "images/milshakededurazno.png   ",
         popular: true,
         badge: "Novedad"
     },
