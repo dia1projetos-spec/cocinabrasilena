@@ -9,7 +9,7 @@ const menuData = [
         id: 1,
         name: "6 Coxinhas de Pollo + Mini Coca-cola",
         category: "principales",
-        price: 7000,
+        price: 8000,
         description: "Coxinhas fritas, rellenas con pollo desmenuzado.",
         image: "images/combopollo.jpeg",
         popular: true,
