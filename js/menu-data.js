@@ -7,17 +7,6 @@ const menuData = [
     // === PLATOS PRINCIPALES ===
     {
         id: 1,
-        name: "6 Coxinhas de Pollo + Mini Coca-cola",
-        category: "principales",
-        price: 8000,
-        description: "Coxinhas fritas, rellenas con pollo desmenuzado.",
-        image: "images/combopollo.jpeg",
-        popular: true,
-        badge: "Más Pedido"
-    },
-
-    {
-        id: 2,
         name: "Vaso de Maravillas Saladas",
         category: "principales",
         price: 4000,
@@ -30,28 +19,10 @@ const menuData = [
     
 
     // === Combos ===
+   
+
     {
         id: 9,
-        name: "3 Estrellas rellenas",
-        category: "Combos",
-        price: 4500,
-        description: "Estrella rellena con un delicioso puré de papas, queso cremoso y un toque de orégano.",
-        image: "images/tresestrellas.jpeg",
-        popular: false
-    },
-
-    {
-        id: 10,
-        name: "3 Estrellas rellenas + Mini Coca-Cola",
-        category: "Combos",
-        price: 5500,
-        description: "Estrella rellena con un delicioso puré de papas, queso cremoso y un toque de orégano + Una Mini-Coca",
-        image: "images/tresestrellasycoca.jpeg",
-        popular: false
-    },
-
-    {
-        id: 11,
         name: "Copo de Maraviilas + Milshake Alcohólico de Durazno",
         category: "Combos",
         price: 8000,
@@ -70,7 +41,7 @@ const menuData = [
         description: "El cóctel más famoso de Brasil. Cachaça, limón, azúcar y hielo. Refrescante y potente.",
         image: "images/caipirinha.png   ",
         popular: true,
-        badge: "Clásico"
+        badge: "no tenemos"
     },
 
     {
@@ -81,7 +52,7 @@ const menuData = [
         description: "Rica bebida hecha con leche, vodka y durazno",
         image: "images/milshakededurazno.png   ",
         popular: true,
-        badge: "Novedad"
+        badge: "no tenemos"
     },
     
 
@@ -94,7 +65,7 @@ const menuData = [
         description: "Estrella rellena con un delicioso puré de papas, queso cremoso y un toque de orégano.",
         image: "images/unaestrella.jpeg",
         popular: true,
-        badge: "Imperdible"
+        badge: "no tenemos"
     },
    
 ];
