@@ -30,12 +30,22 @@ const menuData = [
         image: "images/milkshakeyaravilla.jpg",
         popular: false
     },
+
+    {
+        id: 10,
+        name: "Combo 6 Coxinhas de Pollo + Mini Coca-cola",
+        category: "Combos",
+        price: 8500,
+        description: "Un Combo Perfecto",
+        image: "images/combopollo.jpeg",
+        popular: false
+    },
    
 
     // === BEBIDAS ===
     {
         id: 15,
-        name: "Caipirinha Original",
+        name: "Esgotado",
         category: "bebidas",
         price: 6000,
         description: "El cóctel más famoso de Brasil. Cachaça, limón, azúcar y hielo. Refrescante y potente.",
