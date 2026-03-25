@@ -1,430 +1,222 @@
 <!DOCTYPE html>
-<html lang="es-AR">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Cocina Brasileña - Los mejores sabores de Brasil en Argentina">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Cocina Brasileña - Sabores Auténticos</title>
-    <link rel="stylesheet" href="css/styles.css?v=1.0.6">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Righteous&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cocina Brasileña — Comida por Pedido</title>
+  <meta name="description" content="Os melhores sabores do Brasil, fresquinhos e entregues para você.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇧🇷</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/5513981763452" class="whatsapp-float" target="_blank" aria-label="Contactar por WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-    </a>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-top">
-            <div class="container">
-                <div class="header-info">
-                    <div class="info-item">
-                        <i class="fas fa-phone"></i>
-                        <span>+55 13 98176-3452</span>
-                    </div>
-                    <div class="info-item">
-                        <i class="fas fa-clock"></i>
-                        <span>Lun - Dom: 20:00 - 23:00</span>
-                        </div>
-                </div>
-            </div>
+<!-- ═══════════════════════════════════════════
+     LOADING SCREEN
+══════════════════════════════════════════════ -->
+<div id="loading-screen">
+  <div class="loading-brand">Cocina Brasileña</div>
+
+  <!-- Bandeira do Brasil animada como SVG -->
+  <div class="flag-container">
+    <svg class="flag-svg" viewBox="0 0 220 145" xmlns="http://www.w3.org/2000/svg">
+      <!-- Verde -->
+      <rect width="220" height="145" fill="#009C3B" rx="4"/>
+      <!-- Losango Amarelo -->
+      <polygon points="110,12 208,72.5 110,133 12,72.5" fill="#FFDF00"/>
+      <!-- Círculo Azul -->
+      <circle cx="110" cy="72.5" r="35" fill="#002776"/>
+      <!-- Faixa branca -->
+      <path d="M78,72.5 Q110,58 142,72.5" stroke="white" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <!-- Estrelas (simplificadas) -->
+      <circle cx="94" cy="64" r="2.2" fill="white"/>
+      <circle cx="110" cy="60" r="2.2" fill="white"/>
+      <circle cx="126" cy="64" r="2.2" fill="white"/>
+      <circle cx="100" cy="74" r="2.2" fill="white"/>
+      <circle cx="120" cy="74" r="2.2" fill="white"/>
+      <circle cx="110" cy="82" r="2.2" fill="white"/>
+      <!-- Texto ORDEM E PROGRESSO -->
+      <text x="110" y="76" fill="white" font-size="7" text-anchor="middle" font-family="serif" letter-spacing="1">ORDEM E PROGRESSO</text>
+    </svg>
+  </div>
+
+  <div class="loading-bar-wrap">
+    <div class="loading-bar"></div>
+  </div>
+
+  <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;letter-spacing:2px">Carregando sabores...</p>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     STATUS BANNER
+══════════════════════════════════════════════ -->
+<div id="status-banner"></div>
+
+<!-- ═══════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="header-top">
+    <div class="logo-wrap">
+      <img class="logo-img" src="" alt="Logo" style="display:none" onerror="this.style.display='none'">
+      <div>
+        <div class="logo-name">
+          Cocina Brasileña
+          <small>Comida por Pedido</small>
         </div>
-        
-        <nav class="navbar">
-            <div class="container">
-                <div class="nav-wrapper">
-                    <div class="logo-container">
-                        <img src="images/logo.png" alt="Cocina Brasileña Logo" class="logo">
-                    </div>
-                    
-                    <ul class="nav-menu" id="navMenu">
-                        <li><a href="#menu" class="nav-link active">Menú</a></li>
-                        <li><a href="#sobre" class="nav-link">Sobre Nosotros</a></li>
-                        <li><a href="#inicio" class="nav-link">Inicio</a></li>
-                        <li><a href="#contacto" class="nav-link">Contacto</a></li>
-                    </ul>
-                    
-                    <div class="nav-actions">
-                        <button class="cart-btn" id="cartBtn">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-count" id="cartCount">0</span>
-                        </button>
-                        <button class="menu-toggle" id="menuToggle">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Menu Section -->
-    <section id="menu" class="menu menu-first">
-        <div class="menu-hero">
-            <div class="container">
-                <div class="menu-hero-content">
-                    <div class="menu-hero-text">
-                        <h1 class="menu-hero-title">
-                            <span class="title-accent">Sabores Auténticos</span>
-                            <span class="title-main">de Brasil y del mundo</span>
-                        </h1>
-                        <p class="menu-hero-subtitle">
-                           Traemos platos típicos de Brasil y sabores del mundo para todos los gustos.
-                        </p>
-                    </div>
-                    <div class="menu-hero-mascot">
-                        <img src="images/mascote.jpg" alt="Cocina Brasileña" class="mascot-image">
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="container">
-            <div class="menu-filters">
-                <button class="filter-btn active" data-category="todos">
-                    <i class="fas fa-globe"></i>
-                    <span>Todos</span>
-                </button>
-                <button class="filter-btn" data-category="principales">
-                    <i class="fas fa-drumstick-bite"></i>
-                    <span>Principales</span>
-                </button>
-                <button class="filter-btn" data-category="Combos">
-                    <i class="fas fa-hamburger"></i>
-                    <i class="fas fa-glass-whiskey"></i>
-                   <span>Combos</span>
-                </button>
-                <button class="filter-btn" data-category="bebidas">
-                    <i class="fas fa-glass-cheers"></i>
-                    <span>Bebidas</span>
-                </button>
-                <button class="filter-btn" data-category="económicos">
-                    <i class="fas fa-piggy-bank"></i>
-                    <span>Económicos</span>
-                </button>
-            </div>
-
-            <div class="menu-grid" id="menuGrid">
-                <!-- Menu items will be dynamically loaded here -->
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="sobre" class="about">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag">Nuestra Historia</span>
-                <h2 class="section-title">Tradición Brasileña en Argentina</h2>
-                <p class="section-subtitle">
-                   En nuestra cocina ofrecemos platos típicos de Brasil y adaptaciones de sabores de todo el mundo.
-                </p>
-            </div>
-            
-            <div class="about-content">
-                <div class="about-cards">
-                    <div class="about-card">
-                        <div class="card-icon green">
-                            <i class="fas fa-utensils"></i>
-                        </div>
-                        <h3>Recetas Auténticas</h3>
-                        <p>Cada plato sigue recetas tradicionales brasileñas y adaptaciones de sabores de todo el mundo.</p>
-                    </div>
-                    
-                    <div class="about-card">
-                        <div class="card-icon yellow">
-                            <i class="fas fa-leaf"></i>
-                        </div>
-                        <h3>Ingredientes Frescos</h3>
-                        <p>Seleccionamos cuidadosamente ingredientes frescos y de calidad premium para garantizar el mejor sabor.</p>
-                    </div>
-                    
-                    <div class="about-card">
-                        <div class="card-icon blue">
-                            <i class="fas fa-heart"></i>
-                        </div>
-                        <h3>Hecho con Pasión</h3>
-                        <p>Cada plato es preparado con amor y dedicación, manteniendo viva la tradición culinaria brasileña.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Hero Stats Section -->
-    <section id="inicio" class="hero-stats-section">
-        <div class="container">
-            <div class="hero-stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-award"></i>
-                    </div>
-                    <div class="stat-number">1+</div>
-                    <div class="stat-label">Años de Experiencia</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-utensils"></i>
-                    </div>
-                    <div class="stat-number">2+</div>
-                    <div class="stat-label">Platos Auténticos</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-smile"></i>
-                    </div>
-                    <div class="stat-number">70+</div>
-                    <div class="stat-label">Clientes Felices</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="stat-number">5.0</div>
-                    <div class="stat-label">Calificación Promedio</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contacto" class="contact">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag">Contacto</span>
-                <h2 class="section-title">Encontranos</h2>
-            </div>
-
-            <div class="contact-content">
-                <div class="contact-info">
-                    <div class="contact-card">
-                        <div class="contact-icon">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <h3>Dirección</h3>
-                        <p>Río Primero, Córdoba<br>Argentina</p>
-                    </div>
-
-                    <div class="contact-card">
-                        <div class="contact-icon">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <h3>Teléfono</h3>
-                        <p>+55 13 98176-3452</p>
-                    </div>
-
-                    <div class="contact-card">
-                        <div class="contact-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <h3>Horarios</h3>
-                        <p>Lunes a Domingo<br>11:00 - 23:00</p>
-                    </div>
-
-                    <div class="contact-card">
-                        <div class="contact-icon">
-                            <i class="fab fa-whatsapp"></i>
-                        </div>
-                        <h3>WhatsApp</h3>
-                        <p>
-                            <a href="https://wa.me/5513981763452" target="_blank">
-                                Envianos un mensaje
-                            </a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-wave">
-            <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
-            </svg>
-        </div>
-        
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <img src="images/logo.png" alt="Cocina Brasileña" class="footer-logo">
-                    <p class="footer-text">
-                        Trayendo los sabores auténticos de Brasil a Argentina con pasión y tradición.
-                    </p>
-                    <div class="social-links">
-                        <a href="https://wa.me/5513981763452" target="_blank" class="social-link">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                        <a href="#" class="social-link">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="social-link">
-                            <i class="fab fa-facebook"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="footer-section">
-                    <h4>Enlaces Rápidos</h4>
-                    <ul class="footer-links">
-                        <li><a href="#inicio">Inicio</a></li>
-                        <li><a href="#sobre">Sobre Nosotros</a></li>
-                        <li><a href="#menu">Menú</a></li>
-                        <li><a href="#contacto">Contacto</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-section">
-                    <h4>Contacto</h4>
-                    <ul class="footer-contact">
-                        <li>
-                            <i class="fas fa-phone"></i>
-                            <span>+55 13 98176-3452</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>Río Primero, Córdoba, AR</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-clock"></i>
-                            <span>Lun - Dom: 11:00 - 23:00</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p>&copy; 2025 Cocina Brasileña. Todos los derechos reservados.</p>
-                <p>Hecho con <i class="fas fa-heart"></i> en Argentina</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Cart Modal -->
-    <div class="modal" id="cartModal">
-        <div class="modal-overlay" id="modalOverlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>
-                    <i class="fas fa-shopping-cart"></i>
-                    Tu Pedido
-                </h2>
-                <button class="modal-close" id="modalClose">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <div id="cartItems" class="cart-items">
-                    <!-- Cart items will be dynamically loaded here -->
-                </div>
-                
-                <div id="emptyCart" class="empty-cart">
-                    <i class="fas fa-shopping-basket"></i>
-                    <p>Tu carrito está vacío</p>
-                    <button class="btn btn-primary" id="closeCartEmpty">Explorar Menú</button>
-                </div>
-            </div>
-            
-            <div class="modal-footer" id="cartFooter">
-                <div class="cart-total">
-                    <span>Total:</span>
-                    <span class="total-amount" id="totalAmount">$0.00</span>
-                </div>
-                <button class="btn btn-primary btn-block" id="checkoutBtn">
-                    Finalizar Pedido
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-        </div>
+      </div>
     </div>
 
-    <!-- Checkout Modal -->
-    <div class="modal" id="checkoutModal">
-        <div class="modal-overlay" id="checkoutOverlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>
-                    <i class="fas fa-clipboard-list"></i>
-                    Datos de Entrega
-                </h2>
-                <button class="modal-close" id="checkoutClose">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <form id="checkoutForm" class="checkout-form">
-                    <div class="form-group">
-                        <label for="customerName">
-                            <i class="fas fa-user"></i>
-                            Nombre Completo
-                        </label>
-                        <input type="text" id="customerName" name="name" required placeholder="Ingresá tu nombre">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="customerPhone">
-                            <i class="fas fa-phone"></i>
-                            Teléfono
-                        </label>
-                        <input type="tel" id="customerPhone" name="phone" required placeholder="+54 9 11 1234-5678">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="customerStreet">
-                            <i class="fas fa-road"></i>
-                            Nombre de la Calle
-                        </label>
-                        <input type="text" id="customerStreet" name="street" required placeholder="Ej: Av. Corrientes">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="customerNumber">
-                            <i class="fas fa-home"></i>
-                            Número de Casa
-                        </label>
-                        <input type="text" id="customerNumber" name="number" required placeholder="Ej: 1234">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="customerNotes">
-                            <i class="fas fa-comment"></i>
-                            Observaciones (opcional)
-                        </label>
-                        <textarea id="customerNotes" name="notes" rows="3" placeholder="Ej: Timbre roto, departamento 5B, etc."></textarea>
-                    </div>
-
-                    <div class="order-summary">
-                        <h3>Resumen del Pedido</h3>
-                        <div id="checkoutItems"></div>
-                        <div class="summary-total">
-                            <span>Total a Pagar:</span>
-                            <span id="checkoutTotal">$0.00</span>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fab fa-whatsapp"></i>
-                        Enviar Pedido por WhatsApp
-                    </button>
-                </form>
-            </div>
-        </div>
+    <div class="header-actions">
+      <button class="btn-cart" title="Carrinho">
+        🛒 Carrinho
+        <span class="cart-count">0</span>
+      </button>
     </div>
+  </div>
 
-    <script src="js/menu-data.js?v=1.0.6"></script>
-    <script src="js/cart.js?v=1.0.6"></script>
-    <script src="js/main.js?v=1.0.6"></script>
+  <nav class="main-nav">
+    <ul>
+      <li><a href="#inicio" class="active">Início</a></li>
+      <li><a href="#cardapio">Cardápio</a></li>
+      <li><a href="#sobre">Sobre</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- ═══════════════════════════════════════════
+     HERO SLIDER
+══════════════════════════════════════════════ -->
+<section id="inicio" class="hero-slider">
+  <div class="slides-track"></div>
+  <button class="slider-btn prev">&#8249;</button>
+  <button class="slider-btn next">&#8250;</button>
+  <div class="slider-dots"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     PRODUCTS
+══════════════════════════════════════════════ -->
+<section id="cardapio" class="products-section">
+  <div class="section-title">
+    <h2>Nosso Cardápio</h2>
+    <p>Feito com amor, sabor e muito tempero brasileiro 🌶️</p>
+  </div>
+
+  <div class="categories-bar">
+    <button class="cat-btn active" data-cat="todos" onclick="filterProducts('todos')">Todos</button>
+  </div>
+
+  <div id="products-grid" class="products-grid">
+    <!-- produtos carregados via JS -->
+    <div style="grid-column:1/-1;text-align:center;padding:60px;color:#888">
+      <div style="font-size:2.5rem;margin-bottom:12px">🍽️</div>
+      <p>Carregando cardápio...</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SOBRE
+══════════════════════════════════════════════ -->
+<section id="sobre" style="background:var(--azul);color:#fff;padding:60px 5%;text-align:center">
+  <h2 style="font-family:var(--font-display);font-size:2rem;margin-bottom:16px;color:var(--amarelo)">Nossa História</h2>
+  <p style="max-width:600px;margin:0 auto;opacity:0.85;line-height:1.7">
+    A Cocina Brasileña nasceu da paixão pelos sabores autênticos do Brasil.
+    Cada prato é preparado com ingredientes frescos e muito carinho,
+    trazendo o melhor da culinária brasileira diretamente para sua mesa.
+    🇧🇷❤️
+  </p>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-logo">Cocina Brasileña</div>
+  <p>Comida por Pedido · Feito com 💚💛 do Brasil</p>
+  <p style="margin-top:8px;font-size:0.78rem;opacity:0.5">© 2025 Cocina Brasileña. Todos os direitos reservados.</p>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     CART OVERLAY
+══════════════════════════════════════════════ -->
+<div id="cart-overlay" class="cart-overlay"></div>
+
+<!-- ═══════════════════════════════════════════
+     CART DRAWER
+══════════════════════════════════════════════ -->
+<aside id="cart-drawer">
+  <div class="cart-header">
+    <h3>🛒 Meu Carrinho</h3>
+    <button class="cart-close">✕</button>
+  </div>
+  <div id="cart-items" class="cart-items"></div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span>Total do pedido</span>
+      <span id="cart-total-value" class="cart-total-value">R$ 0,00</span>
+    </div>
+    <button class="btn-checkout">
+      📲 Finalizar Pedido via WhatsApp
+    </button>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════
+     CHECKOUT MODAL
+══════════════════════════════════════════════ -->
+<div id="checkout-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📋 Dados para Entrega</h3>
+      <p>Preencha suas informações para finalizar o pedido</p>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>👤 Seu Nome</label>
+        <input id="cust-name" type="text" placeholder="Nome completo" required>
+      </div>
+      <div class="form-group">
+        <label>📱 WhatsApp</label>
+        <input id="cust-wpp" type="tel" placeholder="(99) 99999-9999" required>
+      </div>
+      <div class="form-group">
+        <label>📍 Endereço de Entrega</label>
+        <div class="address-row">
+          <input id="cust-rua" type="text" placeholder="Nome da rua / avenida" required>
+          <input id="cust-num" type="text" placeholder="Número" required>
+        </div>
+        <div style="margin-top:10px">
+          <input id="cust-bairro" type="text" placeholder="Bairro" required>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel">Voltar</button>
+      <button class="btn-confirm">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 0C5.373 0 0 5.373 0 12c0 2.117.554 4.1 1.523 5.82L0 24l6.335-1.51A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.806 9.806 0 01-4.994-1.366l-.358-.214-3.762.898.936-3.673-.234-.376A9.808 9.808 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.429 0 9.818 4.388 9.818 9.818 0 5.43-4.39 9.818-9.819 9.818z"/></svg>
+        Enviar pelo WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     LIGHTBOX
+══════════════════════════════════════════════ -->
+<div id="lightbox">
+  <div class="lightbox-inner">
+    <img id="lightbox-img" src="" alt="Imagem ampliada">
+    <button class="lightbox-close">✕</button>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- ═══════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════ -->
+<script type="module" src="js/main.js"></script>
 </body>
 </html>
