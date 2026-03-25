@@ -13,80 +13,76 @@ function playBerimbau() {
 
     function berimbauNote(freq, startTime, dur) {
       const osc = ctx.createOscillator();
-      const gainNode = ctx.createGain();
+      const gain = ctx.createGain();
       const filter = ctx.createBiquadFilter();
-
       filter.type = 'bandpass';
       filter.frequency.value = freq;
-      filter.Q.value = 8;
-
+      filter.Q.value = 10;
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(freq, startTime);
-      osc.frequency.exponentialRampToValueAtTime(freq * 0.7, startTime + dur * 0.3);
-      osc.frequency.exponentialRampToValueAtTime(freq * 0.5, startTime + dur);
-
-      gainNode.gain.setValueAtTime(0, startTime);
-      gainNode.gain.linearRampToValueAtTime(0.4, startTime + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + dur);
-
-      osc.connect(filter);
-      filter.connect(gainNode);
-      gainNode.connect(ctx.destination);
-
-      osc.start(startTime);
-      osc.stop(startTime + dur);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.65, startTime + dur * 0.4);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.45, startTime + dur);
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(0.35, startTime + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + dur);
+      osc.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+      osc.start(startTime); osc.stop(startTime + dur);
     }
 
-    // Sequência de notas berimbau
     const notes = [
-      { freq: 220, time: 0,    dur: 0.5 },
-      { freq: 246, time: 0.5,  dur: 0.3 },
-      { freq: 220, time: 0.8,  dur: 0.5 },
-      { freq: 196, time: 1.3,  dur: 0.6 },
-      { freq: 220, time: 1.9,  dur: 0.4 },
-      { freq: 246, time: 2.3,  dur: 0.3 },
-      { freq: 220, time: 2.6,  dur: 0.7 },
-      { freq: 196, time: 3.3,  dur: 0.5 },
-      { freq: 174, time: 3.8,  dur: 0.8 },
-      { freq: 196, time: 4.6,  dur: 0.5 },
-      { freq: 220, time: 5.1,  dur: 1.0 },
+      [220,0,0.5],[246,0.5,0.3],[220,0.8,0.5],[196,1.3,0.6],
+      [220,1.9,0.4],[246,2.3,0.3],[220,2.6,0.7],[196,3.3,0.5],
+      [174,3.8,0.8],[196,4.6,0.5],[220,5.1,1.0],
     ];
-
     const now = ctx.currentTime;
-    notes.forEach(n => berimbauNote(n.freq, now + n.time, n.dur));
-  } catch (e) {
-    console.warn('Audio context não disponível:', e);
-  }
+    notes.forEach(([f,t,d]) => berimbauNote(f, now+t, d));
+  } catch(e) {}
 }
 
-// ─── LOADING SCREEN ────────────────────────────
+// ─── LOADING SCREEN ─────────────────────────────
+// Totalmente independente — NÃO depende do Firebase
 function initLoading() {
   const screen = document.getElementById('loading-screen');
-  const bar = document.querySelector('.loading-bar');
+  const bar    = document.getElementById('loading-bar');
+  if (!screen || !bar) return;
+
   let progress = 0;
 
-  // Inicia o som após primeiro click/touch (política do browser)
-  const startSound = () => {
-    playBerimbau();
-    document.removeEventListener('click', startSound);
-    document.removeEventListener('touchstart', startSound);
-  };
-  document.addEventListener('click', startSound);
-  document.addEventListener('touchstart', startSound);
-  // Tenta tocar automaticamente
-  setTimeout(() => { try { playBerimbau(); } catch(e) {} }, 100);
+  // Tenta tocar automaticamente; se bloqueado, toca no primeiro toque
+  const trySound = () => { try { playBerimbau(); } catch(e) {} };
+  trySound();
+  const unlockSound = () => { trySound(); document.removeEventListener('click', unlockSound); document.removeEventListener('touchstart', unlockSound); };
+  document.addEventListener('click', unlockSound);
+  document.addEventListener('touchstart', unlockSound);
 
-  const interval = setInterval(() => {
-    progress += Math.random() * 18;
-    if (progress >= 100) { progress = 100; clearInterval(interval); }
-    bar.style.width = progress + '%';
+  // Barra avança de forma suave e fecha GARANTIDO em ~3s
+  const steps = [10, 25, 10, 20, 15, 10, 10]; // sete passos = ~100%
+  let stepIndex = 0;
 
-    if (progress === 100) {
+  function nextStep() {
+    if (stepIndex >= steps.length) {
+      // Garante 100% e fecha
+      bar.style.width = '100%';
       setTimeout(() => {
-        screen.classList.add('hidden');
-      }, 600);
+        screen.style.opacity = '0';
+        screen.style.transform = 'scale(1.04)';
+        setTimeout(() => {
+          screen.style.display = 'none';
+        }, 600);
+      }, 400);
+      return;
     }
-  }, 220);
+    progress += steps[stepIndex++];
+    bar.style.width = Math.min(progress, 100) + '%';
+    setTimeout(nextStep, 350 + Math.random() * 200);
+  }
+
+  setTimeout(nextStep, 200);
+
+  // Fallback absoluto: se por qualquer motivo ainda estiver visível em 5s, fecha
+  setTimeout(() => {
+    screen.style.display = 'none';
+  }, 5000);
 }
 
 // ─── HERO SLIDER ───────────────────────────────

@@ -16,34 +16,62 @@
 <div id="loading-screen">
   <div class="loading-brand">Cocina Brasileña</div>
 
-  <!-- Bandeira do Brasil animada como SVG -->
+  <!-- Bandeira do Brasil — SVG preciso com clipPath para o texto dentro do círculo -->
   <div class="flag-container">
-    <svg class="flag-svg" viewBox="0 0 220 145" xmlns="http://www.w3.org/2000/svg">
-      <!-- Verde -->
-      <rect width="220" height="145" fill="#009C3B" rx="4"/>
-      <!-- Losango Amarelo -->
-      <polygon points="110,12 208,72.5 110,133 12,72.5" fill="#FFDF00"/>
-      <!-- Círculo Azul -->
-      <circle cx="110" cy="72.5" r="35" fill="#002776"/>
-      <!-- Faixa branca -->
-      <path d="M78,72.5 Q110,58 142,72.5" stroke="white" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-      <!-- Estrelas (simplificadas) -->
-      <circle cx="94" cy="64" r="2.2" fill="white"/>
-      <circle cx="110" cy="60" r="2.2" fill="white"/>
-      <circle cx="126" cy="64" r="2.2" fill="white"/>
-      <circle cx="100" cy="74" r="2.2" fill="white"/>
-      <circle cx="120" cy="74" r="2.2" fill="white"/>
-      <circle cx="110" cy="82" r="2.2" fill="white"/>
-      <!-- Texto ORDEM E PROGRESSO -->
-      <text x="110" y="76" fill="white" font-size="7" text-anchor="middle" font-family="serif" letter-spacing="1">ORDEM E PROGRESSO</text>
+    <svg class="flag-svg" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Clip para confinar tudo dentro do círculo azul -->
+        <clipPath id="circulo-clip">
+          <circle cx="150" cy="100" r="47"/>
+        </clipPath>
+        <!-- Path circular para o texto ORDEM E PROGRESSO -->
+        <path id="texto-arco"
+          d="M 114,100 a 36,36 0 1,1 72,0"
+          fill="none"/>
+      </defs>
+
+      <!-- Fundo verde -->
+      <rect width="300" height="200" fill="#009C3B" rx="6"/>
+
+      <!-- Losango amarelo -->
+      <polygon points="150,14 291,100 150,186 9,100" fill="#FFDF00"/>
+
+      <!-- Círculo azul -->
+      <circle cx="150" cy="100" r="47" fill="#002776"/>
+
+      <!-- Faixa branca dentro do círculo (usando clip) -->
+      <g clip-path="url(#circulo-clip)">
+        <path d="M 103,106 Q 150,82 197,106" stroke="white" stroke-width="6" fill="none" stroke-linecap="round"/>
+      </g>
+
+      <!-- Texto ORDEM E PROGRESSO no arco dentro do círculo -->
+      <text font-size="6.8" fill="white" font-family="Arial, sans-serif" letter-spacing="1.5" font-weight="600">
+        <textPath href="#texto-arco" startOffset="50%" text-anchor="middle">ORDEM E PROGRESSO</textPath>
+      </text>
+
+      <!-- Estrelas dentro do círculo -->
+      <!-- Constelação do Cruzeiro do Sul e outras estrelas simplificadas -->
+      <g fill="white">
+        <!-- Grupo central de estrelas na faixa -->
+        <polygon points="150,88  151.5,93  156.5,93  152.5,96  154,101  150,98  146,101  147.5,96  143.5,93  148.5,93" transform="scale(0.45) translate(183,110)"/>
+        <!-- Estrelas menores espalhadas -->
+        <circle cx="134" cy="90" r="1.6"/>
+        <circle cx="143" cy="86" r="1.4"/>
+        <circle cx="158" cy="84" r="1.8"/>
+        <circle cx="166" cy="90" r="1.4"/>
+        <circle cx="162" cy="98" r="1.6"/>
+        <circle cx="150" cy="95" r="1.3"/>
+        <circle cx="138" cy="97" r="1.4"/>
+        <circle cx="128" cy="98" r="1.2"/>
+      </g>
     </svg>
   </div>
 
   <div class="loading-bar-wrap">
-    <div class="loading-bar"></div>
+    <div class="loading-bar" id="loading-bar"></div>
   </div>
 
-  <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;letter-spacing:2px">Carregando sabores...</p>
+  <p style="color:rgba(255,255,255,0.55);font-size:0.82rem;letter-spacing:3px;text-transform:uppercase">Carregando sabores...</p>
 </div>
 
 <!-- ═══════════════════════════════════════════

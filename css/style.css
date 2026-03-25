@@ -51,6 +51,9 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   transition: opacity 0.7s ease, visibility 0.7s ease;
 }
 #loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+#loading-screen {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
 
 .loading-brand {
   font-family: var(--font-script);
@@ -64,22 +67,31 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 /* FLAG */
 .flag-container {
-  width: 220px; height: 145px;
-  perspective: 800px;
+  width: 260px;
+  height: 174px;
+  position: relative;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));
   transform-origin: left center;
 }
+
 .flag-svg {
-  width: 100%; height: 100%;
-  animation: wave-flag 1.8s ease-in-out infinite;
+  width: 100%;
+  height: 100%;
+  display: block;
+  animation: wave-flag 2.2s ease-in-out infinite;
   transform-origin: left center;
-  filter: drop-shadow(4px 4px 16px rgba(0,0,0,0.5));
+  border-radius: 4px;
 }
+
+/* Animação de vento realista usando skew + scale nos eixos */
 @keyframes wave-flag {
-  0%   { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: skewY(0deg) scaleX(1); }
-  25%  { clip-path: polygon(0 0, 100% 2%, 100% 98%, 0 100%); transform: skewY(1.5deg) scaleX(0.98); }
-  50%  { clip-path: polygon(0 2%, 100% 0, 100% 100%, 0 98%); transform: skewY(-1deg) scaleX(1.02); }
-  75%  { clip-path: polygon(0 0, 100% 3%, 100% 97%, 0 100%); transform: skewY(1deg) scaleX(0.99); }
-  100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: skewY(0deg) scaleX(1); }
+  0%   { transform: perspective(400px) rotateY(0deg)   skewX(0deg); }
+  15%  { transform: perspective(400px) rotateY(4deg)   skewX(-1.5deg); }
+  30%  { transform: perspective(400px) rotateY(-2deg)  skewX(1deg); }
+  50%  { transform: perspective(400px) rotateY(6deg)   skewX(-2deg); }
+  65%  { transform: perspective(400px) rotateY(1deg)   skewX(0.5deg); }
+  80%  { transform: perspective(400px) rotateY(5deg)   skewX(-1.5deg); }
+  100% { transform: perspective(400px) rotateY(0deg)   skewX(0deg); }
 }
 
 .loading-bar-wrap {
