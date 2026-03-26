@@ -141,9 +141,6 @@ function startAutoSlide() {
   autoSlide = setInterval(() => goToSlide(currentSlide + 1), 5000);
 }
 
-document.querySelector('.slider-btn.prev')?.addEventListener('click', () => { goToSlide(currentSlide - 1); startAutoSlide(); });
-document.querySelector('.slider-btn.next')?.addEventListener('click', () => { goToSlide(currentSlide + 1); startAutoSlide(); });
-
 // ─── CART STATE ─────────────────────────────────
 let cart = JSON.parse(localStorage.getItem('cocina_cart') || '[]');
 
@@ -224,68 +221,36 @@ window.changeQty = changeQty;
 window.removeFromCart = removeFromCart;
 
 // ─── CART DRAWER ────────────────────────────────
-const cartDrawer = document.getElementById('cart-drawer');
-const cartOverlay = document.getElementById('cart-overlay');
+let cartDrawer, cartOverlay;
 
-function openCart() { cartDrawer?.classList.add('open'); cartOverlay?.classList.add('active'); }
-function closeCart() { cartDrawer?.classList.remove('open'); cartOverlay?.classList.remove('active'); }
+function openCart()  {
+  cartDrawer?.classList.add('open');
+  cartOverlay?.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeCart() {
+  cartDrawer?.classList.remove('open');
+  cartOverlay?.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// ─── CHECKOUT ───────────────────────────────────
+let checkoutModal;
+
+// ─── LIGHTBOX ───────────────────────────────────
+let lightbox, lightboxImg;
+
+function openLightbox(src) {
+  if (!lightboxImg || !lightbox) return;
+  lightboxImg.src = src;
+  lightbox.classList.add('active');
+}
+function closeLightbox() { lightbox?.classList.remove('active'); }
+window.openLightbox = openLightbox;
 
 document.querySelectorAll('.btn-cart').forEach(btn => btn.addEventListener('click', openCart));
 document.querySelector('.cart-close')?.addEventListener('click', closeCart);
 cartOverlay?.addEventListener('click', closeCart);
-
-// ─── CHECKOUT ───────────────────────────────────
-const checkoutModal = document.getElementById('checkout-modal');
-
-document.querySelector('.btn-checkout')?.addEventListener('click', () => {
-  if (!cart.length) { showToast('⚠️ Adicione itens ao carrinho!'); return; }
-  closeCart();
-  checkoutModal?.classList.add('active');
-});
-
-document.querySelector('.btn-cancel')?.addEventListener('click', () => {
-  checkoutModal?.classList.remove('active');
-});
-
-document.querySelector('.btn-confirm')?.addEventListener('click', () => {
-  const nome = document.getElementById('cust-name')?.value.trim();
-  const wpp  = document.getElementById('cust-wpp')?.value.trim();
-  const rua  = document.getElementById('cust-rua')?.value.trim();
-  const num  = document.getElementById('cust-num')?.value.trim();
-  const bairro = document.getElementById('cust-bairro')?.value.trim();
-
-  if (!nome || !wpp || !rua || !num || !bairro) {
-    showToast('⚠️ Preencha todos os campos!');
-    return;
-  }
-
-  const itemsText = cart.map(i =>
-    `• ${i.name} x${i.qty} — R$ ${(i.price * i.qty).toFixed(2).replace('.', ',')}`
-  ).join('%0A');
-
-  const total = getCartTotal().toFixed(2).replace('.', ',');
-
-  const msg = encodeURIComponent(
-`🇧🇷 *Cocina Brasileña — Novo Pedido*
-
-👤 *Cliente:* ${nome}
-📱 *WhatsApp:* ${wpp}
-📍 *Endereço:* ${rua}, ${num} — ${bairro}
-
-📋 *Itens:*
-${cart.map(i => `• ${i.name} x${i.qty} — R$ ${(i.price * i.qty).toFixed(2).replace('.', ',')}`).join('\n')}
-
-💰 *Total: R$ ${total}*`
-  );
-
-  window.open(`https://wa.me/5513981763452?text=${msg}`, '_blank');
-
-  cart = [];
-  saveCart();
-  updateCartUI();
-  checkoutModal?.classList.remove('active');
-  showToast('✅ Pedido enviado pelo WhatsApp!');
-});
 
 // ─── PRODUCTS ──────────────────────────────────
 let allProducts = [];
@@ -340,21 +305,6 @@ function buildCategoryBar(products) {
     </button>`
   ).join('');
 }
-
-// ─── LIGHTBOX ───────────────────────────────────
-const lightbox = document.getElementById('lightbox');
-const lightboxImg = document.getElementById('lightbox-img');
-
-function openLightbox(src) {
-  if (!lightboxImg || !lightbox) return;
-  lightboxImg.src = src;
-  lightbox.classList.add('active');
-}
-function closeLightbox() { lightbox?.classList.remove('active'); }
-
-window.openLightbox = openLightbox;
-document.querySelector('.lightbox-close')?.addEventListener('click', closeLightbox);
-lightbox?.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
 
 // ─── STATUS BANNER ──────────────────────────────
 function updateStatusBanner(status, msg) {
@@ -422,9 +372,9 @@ async function loadFromFirebase() {
 
 // ─── HAMBURGER MENU ─────────────────────────────
 function initHamburger() {
-  const btn      = document.getElementById('btn-hamburger');
-  const nav      = document.getElementById('main-nav');
-  const overlay  = document.getElementById('nav-overlay');
+  const btn     = document.getElementById('btn-hamburger');
+  const nav     = document.getElementById('main-nav');
+  const overlay = document.getElementById('nav-overlay');
   if (!btn || !nav) return;
 
   function openNav()  {
@@ -444,16 +394,76 @@ function initHamburger() {
 
   btn.addEventListener('click', () => btn.classList.contains('active') ? closeNav() : openNav());
   overlay?.addEventListener('click', closeNav);
-
-  // Fecha ao clicar em link do menu
   nav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeNav));
-
-  // Fecha ao redimensionar para desktop
   window.addEventListener('resize', () => { if (window.innerWidth > 768) closeNav(); });
 }
 
 // ─── INIT ────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  // Referências DOM
+  cartDrawer   = document.getElementById('cart-drawer');
+  cartOverlay  = document.getElementById('cart-overlay');
+  checkoutModal = document.getElementById('checkout-modal');
+  lightbox     = document.getElementById('lightbox');
+  lightboxImg  = document.getElementById('lightbox-img');
+
+  // Slider buttons
+  document.querySelector('.slider-btn.prev')?.addEventListener('click', () => { goToSlide(currentSlide - 1); startAutoSlide(); });
+  document.querySelector('.slider-btn.next')?.addEventListener('click', () => { goToSlide(currentSlide + 1); startAutoSlide(); });
+
+  // Cart
+  document.querySelectorAll('.btn-cart').forEach(btn => btn.addEventListener('click', openCart));
+  document.querySelector('.cart-close')?.addEventListener('click', closeCart);
+  cartOverlay?.addEventListener('click', closeCart);
+
+  // Checkout
+  document.querySelector('.btn-checkout')?.addEventListener('click', () => {
+    if (!cart.length) { showToast('⚠️ Adicione itens ao carrinho!'); return; }
+    closeCart();
+    checkoutModal?.classList.add('active');
+  });
+  document.querySelector('.btn-cancel')?.addEventListener('click', () => {
+    checkoutModal?.classList.remove('active');
+  });
+  document.querySelector('.btn-confirm')?.addEventListener('click', () => {
+    const nome   = document.getElementById('cust-name')?.value.trim();
+    const wpp    = document.getElementById('cust-wpp')?.value.trim();
+    const rua    = document.getElementById('cust-rua')?.value.trim();
+    const num    = document.getElementById('cust-num')?.value.trim();
+    const bairro = document.getElementById('cust-bairro')?.value.trim();
+
+    if (!nome || !wpp || !rua || !num || !bairro) {
+      showToast('⚠️ Preencha todos os campos!');
+      return;
+    }
+
+    const total = getCartTotal().toFixed(2).replace('.', ',');
+    const msg = encodeURIComponent(
+`🇧🇷 *Cocina Brasileña — Novo Pedido*
+
+👤 *Cliente:* ${nome}
+📱 *WhatsApp:* ${wpp}
+📍 *Endereço:* ${rua}, ${num} — ${bairro}
+
+📋 *Itens:*
+${cart.map(i => `• ${i.name} x${i.qty} — R$ ${(i.price * i.qty).toFixed(2).replace('.', ',')}`).join('\n')}
+
+💰 *Total: R$ ${total}*`
+    );
+
+    window.open(`https://wa.me/5513981763452?text=${msg}`, '_blank');
+    cart = [];
+    saveCart();
+    updateCartUI();
+    checkoutModal?.classList.remove('active');
+    showToast('✅ Pedido enviado pelo WhatsApp!');
+  });
+
+  // Lightbox
+  document.querySelector('.lightbox-close')?.addEventListener('click', closeLightbox);
+  lightbox?.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+  // Init
   initLoading();
   initHamburger();
   updateCartUI();

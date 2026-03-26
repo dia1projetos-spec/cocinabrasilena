@@ -199,6 +199,9 @@ function listenProducts() {
   onSnapshot(collection(db, 'products'), snap => {
     products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderProductsTable();
+    // Atualiza contador do dashboard
+    const el = document.getElementById('dash-prod-count');
+    if (el) el.textContent = products.length;
   });
 }
 
@@ -310,6 +313,9 @@ function listenSlides() {
   onSnapshot(collection(db, 'slides'), snap => {
     slides = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order || 0) - (b.order || 0));
     renderSlidesList();
+    // Atualiza contador do dashboard
+    const el = document.getElementById('dash-slides-count');
+    if (el) el.textContent = slides.length;
   });
 }
 
