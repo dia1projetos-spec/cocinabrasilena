@@ -40,13 +40,23 @@ function playBerimbau() {
 }
 
 // ─── LOADING SCREEN ─────────────────────────────
-// Totalmente independente — NÃO depende do Firebase
 function initLoading() {
   const screen = document.getElementById('loading-screen');
-  const bar    = document.getElementById('loading-bar');
-  if (!screen || !bar) return;
+  const bar    = document.querySelector('.loading-bar');
+  if (!screen) return;
 
-  let progress = 0;
+  // Gera partículas flutuantes nas cores do Brasil
+  const particlesEl = document.getElementById('loading-particles');
+  if (particlesEl) {
+    const colors = ['#009C3B','#FFDF00','#002776','#00B347','#FFE050','#0038A0'];
+    for (let i = 0; i < 24; i++) {
+      const p = document.createElement('div');
+      p.className = 'loading-particle';
+      const size = 2.5 + Math.random() * 5.5;
+      p.style.cssText = `width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${Math.random()*100}%;bottom:${Math.random()*20}%;animation-duration:${3.5+Math.random()*5.5}s;animation-delay:${Math.random()*7}s;`;
+      particlesEl.appendChild(p);
+    }
+  }
 
   // Tenta tocar automaticamente; se bloqueado, toca no primeiro toque
   const trySound = () => { try { playBerimbau(); } catch(e) {} };
@@ -55,34 +65,24 @@ function initLoading() {
   document.addEventListener('click', unlockSound);
   document.addEventListener('touchstart', unlockSound);
 
-  // Barra avança de forma suave e fecha GARANTIDO em ~3s
-  const steps = [10, 25, 10, 20, 15, 10, 10]; // sete passos = ~100%
+  let progress = 0;
+  const steps = [10, 22, 12, 18, 15, 13, 10];
   let stepIndex = 0;
 
   function nextStep() {
     if (stepIndex >= steps.length) {
-      // Garante 100% e fecha
-      bar.style.width = '100%';
-      setTimeout(() => {
-        screen.style.opacity = '0';
-        screen.style.transform = 'scale(1.04)';
-        setTimeout(() => {
-          screen.style.display = 'none';
-        }, 600);
-      }, 400);
+      if (bar) bar.style.width = '100%';
+      setTimeout(() => screen.classList.add('hidden'), 450);
+      setTimeout(() => screen.style.display = 'none', 1350);
       return;
     }
     progress += steps[stepIndex++];
-    bar.style.width = Math.min(progress, 100) + '%';
-    setTimeout(nextStep, 350 + Math.random() * 200);
+    if (bar) bar.style.width = Math.min(progress, 100) + '%';
+    setTimeout(nextStep, 320 + Math.random() * 200);
   }
-
-  setTimeout(nextStep, 200);
-
-  // Fallback absoluto: se por qualquer motivo ainda estiver visível em 5s, fecha
-  setTimeout(() => {
-    screen.style.display = 'none';
-  }, 5000);
+  setTimeout(nextStep, 250);
+  // Fallback garantido
+  setTimeout(() => { screen.style.display = 'none'; }, 5500);
 }
 
 // ─── HERO SLIDER ───────────────────────────────
