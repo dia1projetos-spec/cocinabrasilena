@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia Firebase — Cocina Brasileña</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Dancing+Script:wght@700&display=swap');
+  :root {
+    --verde: #009C3B; --azul: #002776; --amarelo: #FFDF00;
+    --bg: #F4F4F0; --card: #fff;
+    --text: #1a1a1a; --muted: #666;
+    --radius: 14px; --radius-sm: 8px;
+    --shadow: 0 4px 24px rgba(0,39,118,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; }
+
+  /* HEADER */
+  .guide-header {
+    background: linear-gradient(135deg, var(--azul) 0%, #003a8c 100%);
+    color: #fff; padding: 48px 5% 40px; text-align: center;
+  }
+  .guide-header .brand { font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: var(--amarelo); margin-bottom: 8px; }
+  .guide-header h1 { font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800; margin-bottom: 10px; }
+  .guide-header p { opacity: 0.8; font-size: 1rem; max-width: 560px; margin: 0 auto; }
+
+  /* LAYOUT */
+  .container { max-width: 860px; margin: 0 auto; padding: 40px 5% 80px; }
+
+  /* PROGRESS BAR */
+  .progress-nav {
+    display: flex; gap: 0; margin-bottom: 40px;
+    background: var(--card); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow);
+  }
+  .progress-nav a {
+    flex: 1; padding: 14px 6px; text-align: center;
+    font-size: 0.75rem; font-weight: 700; color: var(--muted);
+    text-decoration: none; border-right: 1px solid #eee;
+    transition: all 0.2s; line-height: 1.3;
+  }
+  .progress-nav a:last-child { border-right: none; }
+  .progress-nav a:hover { background: #f0f8f0; color: var(--verde); }
+  .progress-nav a .num {
+    display: block; width: 28px; height: 28px; border-radius: 50%;
+    background: #eee; color: #888; font-size: 0.8rem; font-weight: 800;
+    line-height: 28px; margin: 0 auto 4px;
+  }
+  .progress-nav a.done .num { background: var(--verde); color: #fff; }
+
+  /* STEP CARD */
+  .step {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); margin-bottom: 28px; overflow: hidden;
+  }
+  .step-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px 24px; background: linear-gradient(90deg, var(--azul) 0%, #1a3a8a 100%);
+    color: #fff;
+  }
+  .step-num {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--amarelo); color: var(--azul);
+    font-weight: 800; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-header h2 { font-size: 1.05rem; font-weight: 800; }
+  .step-header p { font-size: 0.82rem; opacity: 0.8; margin-top: 2px; }
+
+  .step-body { padding: 24px; }
+
+  /* SUBSTEPS */
+  .substep {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 14px 0; border-bottom: 1px solid #f0f0f0;
+  }
+  .substep:last-child { border-bottom: none; padding-bottom: 0; }
+  .substep-icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(0,156,59,0.1); color: var(--verde);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0; margin-top: 1px;
+  }
+  .substep-content h4 { font-weight: 700; font-size: 0.92rem; margin-bottom: 4px; color: var(--azul); }
+  .substep-content p { font-size: 0.85rem; color: var(--muted); }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: #0d1117; color: #e6edf3;
+    border-radius: var(--radius-sm); padding: 20px;
+    font-family: 'Courier New', monospace; font-size: 0.82rem;
+    line-height: 1.7; overflow-x: auto; margin: 14px 0;
+    position: relative;
+  }
+  .code-block .comment { color: #8b949e; }
+  .code-block .key     { color: #79c0ff; }
+  .code-block .val     { color: #a5d6ff; }
+  .code-block .str     { color: #a8daff; }
+  .code-block .fn      { color: #d2a8ff; }
+  .code-block .kw      { color: #ff7b72; }
+  .code-label {
+    font-size: 0.7rem; font-weight: 700; color: var(--muted);
+    letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 6px; display: block;
+  }
+
+  /* ALERT */
+  .alert {
+    padding: 14px 18px; border-radius: var(--radius-sm);
+    font-size: 0.875rem; display: flex; gap: 10px; align-items: flex-start;
+    margin: 14px 0;
+  }
+  .alert-info    { background: #e8f4ff; border-left: 4px solid #2196f3; color: #0c4a6e; }
+  .alert-warning { background: #fffbeb; border-left: 4px solid #f59e0b; color: #78350f; }
+  .alert-success { background: #ecfdf5; border-left: 4px solid #10b981; color: #064e3b; }
+  .alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* RULES BLOCK */
+  .rules-block {
+    background: #0d1117; color: #e6edf3;
+    border-radius: var(--radius-sm); padding: 20px;
+    font-family: 'Courier New', monospace; font-size: 0.8rem;
+    line-height: 1.8; overflow-x: auto; margin: 14px 0;
+  }
+  .rules-block .r-kw  { color: #ff7b72; }
+  .rules-block .r-str { color: #a8daff; }
+  .rules-block .r-fn  { color: #d2a8ff; }
+  .rules-block .r-cm  { color: #8b949e; }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; margin: 12px 0; }
+  .checklist li {
+    padding: 9px 0; border-bottom: 1px solid #f0f0f0;
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 0.88rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist .ck { font-size: 1rem; flex-shrink: 0; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 14px 0; }
+  th { background: var(--azul); color: #fff; padding: 10px 14px; text-align: left; font-size: 0.78rem; letter-spacing: 0.5px; text-transform: uppercase; }
+  td { padding: 10px 14px; border-bottom: 1px solid #eee; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f9f9f9; }
+  td code { background: #f0f0f0; padding: 2px 7px; border-radius: 4px; font-size: 0.8rem; font-family: monospace; }
+
+  /* TAG */
+  .tag {
+    display: inline-block; padding: 3px 10px; border-radius: 99px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px;
+  }
+  .tag-green  { background: rgba(0,156,59,0.12); color: var(--verde); }
+  .tag-blue   { background: rgba(0,39,118,0.1);  color: var(--azul); }
+  .tag-yellow { background: rgba(255,193,7,0.2); color: #856404; }
+
+  /* FINAL */
+  .final-card {
+    background: linear-gradient(135deg, var(--verde) 0%, #007a30 100%);
+    color: #fff; border-radius: var(--radius); padding: 32px;
+    text-align: center; margin-top: 8px;
+  }
+  .final-card h3 { font-size: 1.4rem; margin-bottom: 10px; }
+  .final-card p { opacity: 0.9; font-size: 0.92rem; margin-bottom: 20px; }
+  .final-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .final-link {
+    background: rgba(255,255,255,0.15); color: #fff;
+    padding: 10px 20px; border-radius: 99px;
+    text-decoration: none; font-weight: 700; font-size: 0.88rem;
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: all 0.2s;
+  }
+  .final-link:hover { background: rgba(255,255,255,0.28); }
+
+  @media (max-width: 600px) {
+    .progress-nav { display: grid; grid-template-columns: 1fr 1fr; }
+    .progress-nav a { border-right: none; border-bottom: 1px solid #eee; }
+    .step-header { flex-direction: row; }
+  }
+</style>
+</head>
+<body>
+
+<div class="guide-header">
+  <div class="brand">Cocina Brasileña</div>
+  <h1>🔥 Guia Completo — Firebase + Cloudinary</h1>
+  <p>Passo a passo para conectar seu site ao banco de dados e ter tudo funcionando em produção.</p>
+</div>
+
+<div class="container">
+
+  <!-- PROGRESS NAV -->
+  <div class="progress-nav">
+    <a href="#passo1"><span class="num">1</span>Criar Projeto</a>
+    <a href="#passo2"><span class="num">2</span>Firestore</a>
+    <a href="#passo3"><span class="num">3</span>Auth</a>
+    <a href="#passo4"><span class="num">4</span>Regras</a>
+    <a href="#passo5"><span class="num">5</span>Credenciais</a>
+    <a href="#passo6"><span class="num">6</span>Cloudinary</a>
+    <a href="#passo7"><span class="num">7</span>Deploy</a>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       PASSO 1 — CRIAR PROJETO FIREBASE
+  ═════════════════════════════════════════= -->
+  <div class="step" id="passo1">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <h2>Criar o Projeto no Firebase</h2>
+        <p>Acesse o console e configure o projeto base</p>
+      </div>
+    </div>
+    <div class="step-body">
+
+      <div class="substep">
+        <div class="substep-icon">🌐</div>
+        <div class="substep-content">
+          <h4>Acesse o Firebase Console</h4>
+          <p>Abra <strong>console.firebase.google.com</strong> no seu navegador. Faça login com sua conta Google.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">➕</div>
+        <div class="substep-content">
+          <h4>Criar novo projeto</h4>
+          <p>Clique em <strong>"Adicionar projeto"</strong>. Digite o nome: <code>cocina-brasilena</code> (ou qualquer nome). Pode desativar o Google Analytics (não precisamos). Clique em <strong>"Criar projeto"</strong>.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">⏳</div>
+        <div class="substep-content">
+          <h4>Aguardar criação</h4>
+          <p>O Firebase cria o projeto em ~30 segundos. Quando aparecer "Seu projeto está pronto", clique em <strong>"Continuar"</strong>.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       PASSO 2 — FIRESTORE
+  ═════════════════════════════════════════= -->
+  <div class="step" id="passo2">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <h2>Ativar o Firestore Database</h2>
+        <p>Banco de dados em tempo real para produtos, slides e configurações</p>
+      </div>
+    </div>
+    <div class="step-body">
+
+      <div class="substep">
+        <div class="substep-icon">🗄️</div>
+        <div class="substep-content">
+          <h4>Ir para Firestore</h4>
+          <p>No menu lateral esquerdo, clique em <strong>"Firestore Database"</strong>. Depois em <strong>"Criar banco de dados"</strong>.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">🔒</div>
+        <div class="substep-content">
+          <h4>Modo de início</h4>
+          <p>Selecione <strong>"Iniciar no modo de produção"</strong>. Não se preocupe — vamos configurar as regras corretas no Passo 4.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">🌍</div>
+        <div class="substep-content">
+          <h4>Localização</h4>
+          <p>Selecione <strong>southamerica-east1 (São Paulo)</strong> para menor latência para seus clientes no Brasil. Clique em <strong>"Ativar"</strong>.</p>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        <span class="alert-icon">ℹ️</span>
+        <span>O Firestore vai criar automaticamente as coleções quando o admin cadastrar o primeiro produto, slide ou configuração. Não é necessário criar manualmente.</span>
+      </div>
+
+      <h4 style="font-weight:700;color:var(--azul);margin-bottom:10px;font-size:0.9rem">📋 Estrutura das coleções que serão criadas automaticamente:</h4>
+      <table>
+        <tr><th>Coleção</th><th>O que armazena</th><th>Quem cria</th></tr>
+        <tr><td><code>products</code></td><td>Produtos do cardápio (nome, preço, foto, categoria...)</td><td>Admin</td></tr>
+        <tr><td><code>slides</code></td><td>Imagens do banner/slider da página inicial</td><td>Admin</td></tr>
+        <tr><td><code>config/logo</code></td><td>URL do logo da loja</td><td>Admin</td></tr>
+        <tr><td><code>config/status</code></td><td>Se está "aberto" ou "cerrado" + mensagem</td><td>Admin</td></tr>
+      </table>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       PASSO 3 — AUTHENTICATION
+  ═════════════════════════════════════════= -->
+  <div class="step" id="passo3">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <h2>Ativar Authentication (Login do Admin)</h2>
+        <p>Criar o usuário administrador do painel</p>
+      </div>
+    </div>
+    <div class="step-body">
+
+      <div class="substep">
+        <div class="substep-icon">🔐</div>
+        <div class="substep-content">
+          <h4>Ir para Authentication</h4>
+          <p>No menu lateral, clique em <strong>"Authentication"</strong>. Depois clique em <strong>"Começar"</strong>.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">✉️</div>
+        <div class="substep-content">
+          <h4>Habilitar E-mail / Senha</h4>
+          <p>Clique em <strong>"E-mail/senha"</strong>. Ative o primeiro toggle (E-mail/senha). Clique em <strong>"Salvar"</strong>.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">👤</div>
+        <div class="substep-content">
+          <h4>Criar o usuário admin</h4>
+          <p>Vá na aba <strong>"Usuários"</strong> → <strong>"Adicionar usuário"</strong>. Digite seu e-mail e crie uma senha forte (guarde bem!). Clique em <strong>"Adicionar usuário"</strong>.</p>
+        </div>
+      </div>
+
+      <div class="alert alert-warning">
+        <span class="alert-icon">⚠️</span>
+        <span><strong>Importante:</strong> Use um e-mail e senha que você não vai esquecer. Esse é o único acesso ao painel administrativo do seu restaurante.</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       PASSO 4 — REGRAS DE SEGURANÇA
+  ═════════════════════════════════════════= -->
+  <div class="step" id="passo4">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <h2>Configurar Regras de Segurança</h2>
+        <p>Clientes só leem; admin escreve, edita e deleta</p>
+      </div>
+    </div>
+    <div class="step-body">
+
+      <div class="substep">
+        <div class="substep-icon">📋</div>
+        <div class="substep-content">
+          <h4>Acessar as Regras</h4>
+          <p>No Firestore Database, clique na aba <strong>"Regras"</strong> no topo da página.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">📝</div>
+        <div class="substep-content">
+          <h4>Substituir pelo código abaixo</h4>
+          <p>Apague tudo que está no editor e cole o código abaixo. Depois clique em <strong>"Publicar"</strong>.</p>
+        </div>
+      </div>
+
+      <span class="code-label">Firestore → Database → Regras — Cole exatamente este código:</span>
+      <div class="rules-block">
+<span class="r-kw">rules_version</span> = <span class="r-str">'2'</span>;
+<span class="r-kw">service</span> cloud.firestore {
+  <span class="r-kw">match</span> /databases/{database}/documents {
+
+    <span class="r-cm">// Produtos: qualquer um lê, só admin escreve</span>
+    <span class="r-kw">match</span> /products/{productId} {
+      <span class="r-fn">allow</span> read:  <span class="r-kw">if</span> true;
+      <span class="r-fn">allow</span> write: <span class="r-kw">if</span> request.auth != null;
+    }
+
+    <span class="r-cm">// Slides do banner</span>
+    <span class="r-kw">match</span> /slides/{slideId} {
+      <span class="r-fn">allow</span> read:  <span class="r-kw">if</span> true;
+      <span class="r-fn">allow</span> write: <span class="r-kw">if</span> request.auth != null;
+    }
+
+    <span class="r-cm">// Config (logo, status aberto/fechado)</span>
+    <span class="r-kw">match</span> /config/{configId} {
+      <span class="r-fn">allow</span> read:  <span class="r-kw">if</span> true;
+      <span class="r-fn">allow</span> write: <span class="r-kw">if</span> request.auth != null;
+    }
+  }
+}
+      </div>
+
+      <div class="alert alert-success">
+        <span class="alert-icon">✅</span>
+        <span>Essas regras garantem que <strong>clientes</strong> vejam o cardápio sem precisar de conta, mas <strong>somente você</strong> (logado no admin) pode adicionar, editar ou deletar produtos.</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       PASSO 5 — CREDENCIAIS NO CÓDIGO
+  ═════════════════════════════════════════= -->
+  <div class="step" id="passo5">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div>
+        <h2>Conectar as Credenciais ao Site</h2>
+        <p>Copiar as chaves do Firebase para o arquivo de configuração</p>
+      </div>
+    </div>
+    <div class="step-body">
+
+      <div class="substep">
+        <div class="substep-icon">⚙️</div>
+        <div class="substep-content">
+          <h4>Acessar configurações do projeto</h4>
+          <p>Clique no ícone de engrenagem ⚙️ ao lado de "Visão geral do projeto" no menu lateral. Selecione <strong>"Configurações do projeto"</strong>.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">🌐</div>
+        <div class="substep-content">
+          <h4>Adicionar app da Web</h4>
+          <p>Role a página até <strong>"Seus apps"</strong>. Clique no ícone <strong>&lt;/&gt;</strong> (Web). Digite um apelido: <code>cocina-site</code>. <strong>Não</strong> marque "Firebase Hosting". Clique em <strong>"Registrar app"</strong>.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">📋</div>
+        <div class="substep-content">
+          <h4>Copiar as credenciais</h4>
+          <p>O Firebase vai mostrar um bloco de código com o <code>firebaseConfig</code>. Copie os valores.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">✏️</div>
+        <div class="substep-content">
+          <h4>Editar o arquivo <code>js/firebase-config.js</code></h4>
+          <p>Abra o arquivo no seu computador e substitua os valores de exemplo pelos reais:</p>
+        </div>
+      </div>
+
+      <span class="code-label">js/firebase-config.js — Substitua com suas credenciais reais:</span>
+      <div class="code-block">
+<span class="comment">// =============================================</span>
+<span class="comment">// Cole aqui as credenciais do seu Firebase</span>
+<span class="comment">// =============================================</span>
+<span class="kw">import</span> { initializeApp } <span class="kw">from</span> <span class="str">"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"</span>;
+<span class="kw">import</span> { getFirestore } <span class="kw">from</span> <span class="str">"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"</span>;
+<span class="kw">import</span> { getAuth } <span class="kw">from</span> <span class="str">"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"</span>;
+
+<span class="kw">const</span> <span class="key">firebaseConfig</span> = {
+  <span class="key">apiKey</span>:            <span class="str">"AIzaSy..."</span>,           <span class="comment">// ← cole o seu</span>
+  <span class="key">authDomain</span>:        <span class="str">"seu-projeto.firebaseapp.com"</span>,
+  <span class="key">projectId</span>:         <span class="str">"seu-projeto"</span>,
+  <span class="key">storageBucket</span>:     <span class="str">"seu-projeto.appspot.com"</span>,
+  <span class="key">messagingSenderId</span>: <span class="str">"123456789"</span>,
+  <span class="key">appId</span>:             <span class="str">"1:123456789:web:abc123"</span>
+};
+
+<span class="kw">const</span> <span class="key">app</span> = initializeApp(firebaseConfig);
+<span class="kw">export const</span> <span class="key">db</span>   = getFirestore(app);
+<span class="kw">export const</span> <span class="key">auth</span> = getAuth(app);
+
+<span class="comment">// =============================================</span>
+<span class="comment">// Cloudinary — preencher no Passo 6</span>
+<span class="comment">// =============================================</span>
+<span class="kw">export const</span> <span class="key">CLOUDINARY_CONFIG</span> = {
+  <span class="key">cloudName</span>:    <span class="str">"seu-cloud-name"</span>,   <span class="comment">// ← preencher no passo 6</span>
+  <span class="key">uploadPreset</span>: <span class="str">"seu-preset"</span>        <span class="comment">// ← preencher no passo 6</span>
+};
+      </div>
+
+      <div class="alert alert-warning">
+        <span class="alert-icon">🔑</span>
+        <span><strong>Segurança:</strong> O <code>apiKey</code> do Firebase para Web é público por design — ele é necessário para o site funcionar. A segurança real está nas <strong>Regras do Firestore</strong> que configuramos no Passo 4.</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       PASSO 6 — CLOUDINARY
+  ═════════════════════════════════════════= -->
+  <div class="step" id="passo6">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div>
+        <h2>Configurar o Cloudinary (Imagens)</h2>
+        <p>Hospedagem de fotos dos produtos, logo e slides</p>
+      </div>
+    </div>
+    <div class="step-body">
+
+      <div class="substep">
+        <div class="substep-icon">📝</div>
+        <div class="substep-content">
+          <h4>Criar conta gratuita</h4>
+          <p>Acesse <strong>cloudinary.com</strong> → clique em <strong>"Sign Up For Free"</strong>. A conta gratuita oferece 25 GB de armazenamento — mais do que suficiente para começar.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">📋</div>
+        <div class="substep-content">
+          <h4>Anotar o Cloud Name</h4>
+          <p>Após o login, no <strong>Dashboard</strong> você verá o <strong>"Cloud name"</strong> no topo (ex: <code>dxyz123abc</code>). Anote esse valor.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">⚙️</div>
+        <div class="substep-content">
+          <h4>Criar Upload Preset</h4>
+          <p>Vá em <strong>Settings</strong> (ícone de engrenagem) → <strong>Upload</strong> → role até <strong>"Upload presets"</strong> → clique em <strong>"Add upload preset"</strong>.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">🔓</div>
+        <div class="substep-content">
+          <h4>Configurar o preset</h4>
+          <p>Em <strong>"Signing Mode"</strong> selecione <strong>"Unsigned"</strong> (obrigatório para funcionar pelo navegador sem backend). Anote o <strong>"Preset name"</strong> gerado. Clique em <strong>"Save"</strong>.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">✏️</div>
+        <div class="substep-content">
+          <h4>Atualizar o <code>firebase-config.js</code></h4>
+          <p>Preencha os valores de Cloudinary no arquivo:</p>
+        </div>
+      </div>
+
+      <span class="code-label">Parte final do firebase-config.js:</span>
+      <div class="code-block">
+<span class="kw">export const</span> <span class="key">CLOUDINARY_CONFIG</span> = {
+  <span class="key">cloudName</span>:    <span class="str">"dxyz123abc"</span>,    <span class="comment">// ← seu Cloud name real</span>
+  <span class="key">uploadPreset</span>: <span class="str">"cocina_upload"</span>  <span class="comment">// ← nome do preset criado</span>
+};
+      </div>
+
+      <div class="alert alert-success">
+        <span class="alert-icon">✅</span>
+        <span>Com isso, quando você fizer upload de foto de produto ou logo no painel admin, a imagem vai direto para o Cloudinary e a URL fica salva no Firestore. Rápido e sem custo no início!</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       PASSO 7 — DEPLOY GITHUB + VERCEL
+  ═════════════════════════════════════════= -->
+  <div class="step" id="passo7">
+    <div class="step-header">
+      <div class="step-num">7</div>
+      <div>
+        <h2>Deploy — GitHub + Vercel</h2>
+        <p>Colocar o site no ar com domínio personalizado</p>
+      </div>
+    </div>
+    <div class="step-body">
+
+      <div class="substep">
+        <div class="substep-icon">📁</div>
+        <div class="substep-content">
+          <h4>Criar repositório no GitHub</h4>
+          <p>Acesse <strong>github.com</strong> → <strong>"New repository"</strong>. Nome: <code>cocina-brasilena</code>. Deixe <strong>Public</strong> (necessário para o Vercel gratuito). Clique em <strong>"Create repository"</strong>.</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">📤</div>
+        <div class="substep-content">
+          <h4>Fazer upload dos arquivos</h4>
+          <p>Na página do repositório clique em <strong>"uploading an existing file"</strong>. Arraste <strong>todos os arquivos</strong> do ZIP (descompactados) para lá. Clique em <strong>"Commit changes"</strong>.</p>
+        </div>
+      </div>
+
+      <div class="alert alert-warning">
+        <span class="alert-icon">⚠️</span>
+        <span>Certifique-se de que o <code>firebase-config.js</code> já tem as credenciais reais <strong>antes</strong> de subir para o GitHub. O arquivo <code>img/logo.png</code> também deve estar incluído.</span>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">🚀</div>
+        <div class="substep-content">
+          <h4>Deploy no Vercel</h4>
+          <p>Acesse <strong>vercel.com</strong> → faça login com o GitHub. Clique em <strong>"New Project"</strong> → selecione o repositório <code>cocina-brasilena</code>. Clique em <strong>"Deploy"</strong> — sem precisar configurar nada!</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">🌐</div>
+        <div class="substep-content">
+          <h4>Domínio personalizado (opcional)</h4>
+          <p>No painel Vercel, vá em <strong>Settings → Domains</strong>. Adicione seu domínio. Siga as instruções de DNS que o Vercel mostra (normalmente configura em &lt; 5 minutos).</p>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="substep-icon">🔒</div>
+        <div class="substep-content">
+          <h4>Autorizar domínio no Firebase</h4>
+          <p>Volte ao Firebase → <strong>Authentication → Settings → Domínios autorizados</strong>. Adicione o domínio do Vercel (ex: <code>cocina-brasilena.vercel.app</code>) e também o domínio personalizado, se tiver.</p>
+        </div>
+      </div>
+
+      <div class="alert alert-success">
+        <span class="alert-icon">🎉</span>
+        <span>A cada vez que você fizer alterações e enviar para o GitHub, o Vercel atualiza o site automaticamente em segundos!</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CHECKLIST FINAL -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">✓</div>
+      <div>
+        <h2>Checklist Final — Tudo Pronto?</h2>
+        <p>Verifique cada item antes de divulgar o site</p>
+      </div>
+    </div>
+    <div class="step-body">
+      <ul class="checklist">
+        <li><span class="ck">☐</span> Projeto Firebase criado</li>
+        <li><span class="ck">☐</span> Firestore ativado na região southamerica-east1</li>
+        <li><span class="ck">☐</span> Authentication com e-mail/senha habilitado</li>
+        <li><span class="ck">☐</span> Usuário admin criado no Firebase Auth</li>
+        <li><span class="ck">☐</span> Regras de segurança publicadas no Firestore</li>
+        <li><span class="ck">☐</span> Credenciais reais no <code>js/firebase-config.js</code></li>
+        <li><span class="ck">☐</span> Conta Cloudinary criada + preset "Unsigned" configurado</li>
+        <li><span class="ck">☐</span> Cloud name e upload preset preenchidos no config</li>
+        <li><span class="ck">☐</span> Repositório GitHub criado e arquivos enviados</li>
+        <li><span class="ck">☐</span> Deploy no Vercel funcionando</li>
+        <li><span class="ck">☐</span> Domínio autorizado no Firebase Authentication</li>
+        <li><span class="ck">☐</span> Login no admin funcionando (<code>seusite.com/admin</code>)</li>
+        <li><span class="ck">☐</span> Cadastrou pelo menos 1 produto pelo admin</li>
+        <li><span class="ck">☐</span> Testou pedido pelo WhatsApp até o fim</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CARD FINAL -->
+  <div class="final-card">
+    <h3>🇧🇷 Site pronto para receber pedidos!</h3>
+    <p>Com tudo configurado, seu restaurante estará online 24h recebendo pedidos pelo WhatsApp com o cardápio sempre atualizado pelo painel admin.</p>
+    <div class="final-links">
+      <a href="https://console.firebase.google.com" target="_blank" class="final-link">🔥 Firebase Console</a>
+      <a href="https://cloudinary.com" target="_blank" class="final-link">☁️ Cloudinary</a>
+      <a href="https://vercel.com" target="_blank" class="final-link">🚀 Vercel</a>
+      <a href="https://github.com" target="_blank" class="final-link">🐙 GitHub</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

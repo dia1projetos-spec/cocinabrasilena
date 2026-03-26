@@ -420,9 +420,42 @@ async function loadFromFirebase() {
   }
 }
 
+// ─── HAMBURGER MENU ─────────────────────────────
+function initHamburger() {
+  const btn      = document.getElementById('btn-hamburger');
+  const nav      = document.getElementById('main-nav');
+  const overlay  = document.getElementById('nav-overlay');
+  if (!btn || !nav) return;
+
+  function openNav()  {
+    nav.classList.add('open');
+    btn.classList.add('active');
+    overlay?.classList.add('active');
+    btn.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeNav() {
+    nav.classList.remove('open');
+    btn.classList.remove('active');
+    overlay?.classList.remove('active');
+    btn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  btn.addEventListener('click', () => btn.classList.contains('active') ? closeNav() : openNav());
+  overlay?.addEventListener('click', closeNav);
+
+  // Fecha ao clicar em link do menu
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeNav));
+
+  // Fecha ao redimensionar para desktop
+  window.addEventListener('resize', () => { if (window.innerWidth > 768) closeNav(); });
+}
+
 // ─── INIT ────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initLoading();
+  initHamburger();
   updateCartUI();
   loadFromFirebase();
 });
