@@ -18,113 +18,11 @@
   <!-- Partículas flutuantes -->
   <div class="loading-particles" id="loading-particles"></div>
 
-  <!-- Mastro + Bandeira -->
-  <div class="flag-assembly">
-    <div class="flag-pole"></div>
-    <div class="flag-3d">
-      <div class="flag-wave-wrap">
-
-        <!-- BANDEIRA DO BRASIL — SVG Premium com texto correto dentro do círculo -->
-        <svg viewBox="0 0 295 195" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
-          <defs>
-            <linearGradient id="ld-verde" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%"   stop-color="#00AE42"/>
-              <stop offset="60%"  stop-color="#009C3B"/>
-              <stop offset="100%" stop-color="#007830"/>
-            </linearGradient>
-            <linearGradient id="ld-azul" x1="0.2" y1="0" x2="0.8" y2="1">
-              <stop offset="0%"   stop-color="#0038A0"/>
-              <stop offset="100%" stop-color="#001C60"/>
-            </linearGradient>
-            <linearGradient id="ld-brilho" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stop-color="rgba(255,255,255,0.10)"/>
-              <stop offset="100%" stop-color="rgba(0,0,0,0.07)"/>
-            </linearGradient>
-            <filter id="ld-blur" x="-15%" y="-15%" width="130%" height="130%">
-              <feGaussianBlur stdDeviation="3.5"/>
-            </filter>
-            <!-- Arco correto para texto: semicírculo inferior do círculo azul, de esquerda p/ direita -->
-            <path id="ld-arc"
-              d="M 100,97 A 48,48 0 0 1 196,97"
-              fill="none"/>
-          </defs>
-
-          <!-- Fundo verde -->
-          <rect width="295" height="195" rx="5" fill="url(#ld-verde)"/>
-
-          <!-- Sombra do losango -->
-          <polygon points="148,13 282,97 148,181 14,97"
-            fill="rgba(0,0,0,0.2)" transform="translate(4,5)"
-            filter="url(#ld-blur)"/>
-
-          <!-- Losango amarelo -->
-          <polygon points="148,13 282,97 148,181 14,97" fill="#FFDF00"/>
-
-          <!-- Brilho no losango -->
-          <polygon points="148,13 282,97 148,181 14,97" fill="url(#ld-brilho)"/>
-
-          <!-- Sombra do círculo azul -->
-          <circle cx="148" cy="97" r="58"
-            fill="rgba(0,0,0,0.22)" transform="translate(3,5)"
-            filter="url(#ld-blur)"/>
-
-          <!-- Círculo azul -->
-          <circle cx="148" cy="97" r="58" fill="url(#ld-azul)"/>
-
-          <!-- Anel de luz na borda do círculo -->
-          <circle cx="148" cy="97" r="58"
-            fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-
-          <!-- Faixa branca (arco com curva suave) -->
-          <path d="M 106,97 Q 148,76 190,97"
-            fill="none" stroke="white" stroke-width="9.5" stroke-linecap="round"/>
-
-          <!-- Texto ORDEM E PROGRESSO dentro do círculo azul, sobre a faixa -->
-          <text font-family="Georgia,serif" font-size="8.8" font-weight="bold"
-                fill="#001555" letter-spacing="1.1">
-            <textPath href="#ld-arc" startOffset="50%" text-anchor="middle">ORDEM E PROGRESSO</textPath>
-          </text>
-
-          <!-- ── CONSTELAÇÕES ── -->
-          <!-- Cruzeiro do Sul (posições proporcionais reais) -->
-          <circle class="s-tw1" cx="127" cy="79"  r="3.4" fill="white"/><!-- Alfa (maior) -->
-          <circle cx="134"       cy="73"  r="2.7" fill="white"/><!-- Beta -->
-          <circle cx="143"       cy="68"  r="2.3" fill="white"/><!-- Gama -->
-          <circle cx="135"       cy="84"  r="1.9" fill="white" opacity="0.9"/><!-- Delta -->
-          <circle class="s-tw2"  cx="124" cy="69"  r="1.6" fill="white" opacity="0.85"/><!-- Épsilon -->
-
-          <!-- Alfa e Beta Centauri -->
-          <circle class="s-tw3"  cx="163" cy="74"  r="3.2" fill="white"/>
-          <circle cx="172"       cy="76"  r="2.5" fill="white"/>
-
-          <!-- Escorpião / Virgem e outras -->
-          <circle cx="153"       cy="108" r="2.1" fill="white" opacity="0.9"/>
-          <circle cx="142"       cy="115" r="1.8" fill="white" opacity="0.85"/>
-          <circle cx="164"       cy="113" r="1.8" fill="white" opacity="0.85"/>
-          <circle class="s-tw2"  cx="175" cy="90"  r="1.8" fill="white" opacity="0.8"/>
-          <circle cx="179"       cy="101" r="2.1" fill="white" opacity="0.85"/>
-          <circle cx="169"       cy="109" r="1.6" fill="white" opacity="0.75"/>
-          <circle cx="116"       cy="95"  r="1.8" fill="white" opacity="0.8"/>
-          <circle cx="115"       cy="83"  r="1.5" fill="white" opacity="0.7"/>
-          <circle cx="185"       cy="97"  r="1.5" fill="white" opacity="0.7"/>
-
-          <!-- Estrelas menores -->
-          <circle class="s-tw3"  cx="154" cy="60"  r="1.3" fill="white" opacity="0.65"/>
-          <circle cx="178"       cy="63"  r="1.3" fill="white" opacity="0.6"/>
-          <circle cx="113"       cy="105" r="1.2" fill="white" opacity="0.55"/>
-          <circle cx="163"       cy="121" r="1.2" fill="white" opacity="0.5"/>
-          <circle cx="140"       cy="124" r="1.1" fill="white" opacity="0.5"/>
-        </svg>
-
-        <!-- Reflexo de luz deslizando -->
-        <div class="flag-sheen"></div>
-      </div>
-    </div>
+  <!-- Logo animado -->
+  <div class="loading-logo-wrap">
+    <img src="img/logo.png" alt="Cocina Brasileña" class="loading-logo-img" id="loading-logo">
+    <div class="loading-logo-glow"></div>
   </div>
-
-  <!-- Textos -->
-  <div class="loading-brand">Cocina Brasileña</div>
-  <div class="loading-sub">Comida por Pedido</div>
 
   <!-- Barra de progresso -->
   <div class="loading-bar-wrap">
