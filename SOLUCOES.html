@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Problemas e Soluções — Cocina Brasileña</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: #f4f4f0; color: #1a1a1a; line-height: 1.65; }
+  .header { background: linear-gradient(135deg, #002776, #1a3a8a); color: #fff; padding: 40px 5%; text-align: center; }
+  .header h1 { font-size: 1.8rem; margin-bottom: 8px; }
+  .header p  { opacity: 0.8; }
+  .container { max-width: 820px; margin: 0 auto; padding: 36px 5% 80px; }
+  .card { background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(0,39,118,.10); margin-bottom: 24px; overflow: hidden; }
+  .card-head { padding: 18px 24px; display: flex; align-items: center; gap: 14px; }
+  .card-head.red    { background: #fee2e2; }
+  .card-head.green  { background: #dcfce7; }
+  .card-head.blue   { background: #dbeafe; }
+  .card-head.yellow { background: #fef9c3; }
+  .card-head .icon { font-size: 1.6rem; }
+  .card-head h2 { font-size: 1rem; font-weight: 800; }
+  .card-head p  { font-size: 0.82rem; color: #555; margin-top: 2px; }
+  .card-body { padding: 22px 24px; }
+  ol, ul { padding-left: 20px; }
+  li { margin-bottom: 10px; font-size: 0.9rem; }
+  li strong { color: #002776; }
+  code { background: #f0f0f0; padding: 2px 7px; border-radius: 4px; font-size: 0.82rem; font-family: monospace; }
+  .rules-box {
+    background: #0d1117; color: #e6edf3;
+    border-radius: 8px; padding: 18px 20px;
+    font-family: 'Courier New', monospace; font-size: 0.8rem;
+    line-height: 1.8; overflow-x: auto; margin: 14px 0;
+  }
+  .kw  { color: #ff7b72; }
+  .str { color: #a8daff; }
+  .fn  { color: #d2a8ff; }
+  .cm  { color: #8b949e; }
+  .alert { padding: 13px 16px; border-radius: 8px; font-size: 0.875rem; margin: 12px 0; border-left: 4px solid; }
+  .alert-warn { background: #fffbeb; border-color: #f59e0b; color: #78350f; }
+  .alert-ok   { background: #ecfdf5; border-color: #10b981; color: #064e3b; }
+  .alert-info { background: #eff6ff; border-color: #3b82f6; color: #1e3a8a; }
+  img.screenshot { width: 100%; border-radius: 8px; border: 1px solid #e0e0e0; margin: 10px 0; }
+  .step-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: #002776; color: #fff; border-radius: 50%; font-size: 0.78rem; font-weight: 800; margin-right: 8px; flex-shrink: 0; }
+  .step-row { display: flex; align-items: flex-start; gap: 0; margin-bottom: 12px; font-size: 0.9rem; }
+  .step-row .step-num { margin-top: 2px; }
+  h3 { font-size: 0.9rem; font-weight: 800; color: #002776; margin: 18px 0 10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🛠️ Problemas e Soluções</h1>
+  <p>Guia rápido para resolver login, Cloudinary e regras do Firebase</p>
+</div>
+
+<div class="container">
+
+  <!-- ── PROBLEMA 1: LOGIN ── -->
+  <div class="card">
+    <div class="card-head red">
+      <div class="icon">🔐</div>
+      <div>
+        <h2>Problema: Não consigo fazer login no Admin</h2>
+        <p>Acesse: seusite.com/admin — deve aparecer a tela de login</p>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <h3>✅ O que verificar:</h3>
+
+      <div class="step-row"><span class="step-num">1</span>
+        <div><strong>Domínio autorizado no Firebase</strong><br>
+        Vá em <strong>Firebase Console → Authentication → Settings → Domínios autorizados</strong><br>
+        Adicione: <code>localhost</code> e o domínio do Vercel (ex: <code>cocina-brasilena.vercel.app</code>)<br>
+        Se tiver domínio próprio, adicione ele também.</div>
+      </div>
+
+      <div class="step-row"><span class="step-num">2</span>
+        <div><strong>Usuário criado no Firebase</strong><br>
+        Firebase Console → Authentication → <strong>Users</strong><br>
+        Deve ter pelo menos 1 usuário na lista. Se não tiver, clique em <strong>"Add user"</strong> e crie com seu e-mail e senha.</div>
+      </div>
+
+      <div class="step-row"><span class="step-num">3</span>
+        <div><strong>E-mail verificado?</strong><br>
+        Não precisa verificar — o Firebase permite login mesmo sem verificação de e-mail.</div>
+      </div>
+
+      <div class="step-row"><span class="step-num">4</span>
+        <div><strong>Abrir o console do navegador (F12 → Console)</strong><br>
+        Se aparecer erro começando com <code>auth/</code>, a descrição exata do erro aparece na tela de login agora.<br>
+        Erros comuns: <code>auth/invalid-credential</code> = senha errada · <code>auth/network-request-failed</code> = sem internet · <code>auth/too-many-requests</code> = aguardar alguns minutos</div>
+      </div>
+
+      <div class="alert alert-info">
+        ℹ️ O endereço do painel admin é sempre: <code>seusite.com/admin/index.html</code> ou <code>seusite.com/admin</code>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── REGRAS FIRESTORE ── -->
+  <div class="card">
+    <div class="card-head yellow">
+      <div class="icon">📋</div>
+      <div>
+        <h2>Regras do Firestore — Cole no Console</h2>
+        <p>Firebase Console → Firestore Database → Aba "Regras"</p>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <p style="font-size:0.88rem;margin-bottom:12px">Apague tudo que está no editor e cole exatamente este código:</p>
+
+      <div class="rules-box">
+<span class="kw">rules_version</span> = <span class="str">'2'</span>;
+<span class="kw">service</span> cloud.firestore {
+  <span class="kw">match</span> /databases/{database}/documents {
+
+    <span class="cm">// Produtos: qualquer um lê, só admin escreve</span>
+    <span class="kw">match</span> /products/{productId} {
+      <span class="fn">allow</span> read:  <span class="kw">if</span> true;
+      <span class="fn">allow</span> write: <span class="kw">if</span> request.auth != null;
+    }
+
+    <span class="cm">// Slides do banner</span>
+    <span class="kw">match</span> /slides/{slideId} {
+      <span class="fn">allow</span> read:  <span class="kw">if</span> true;
+      <span class="fn">allow</span> write: <span class="kw">if</span> request.auth != null;
+    }
+
+    <span class="cm">// Configurações (logo, status)</span>
+    <span class="kw">match</span> /config/{configId} {
+      <span class="fn">allow</span> read:  <span class="kw">if</span> true;
+      <span class="fn">allow</span> write: <span class="kw">if</span> request.auth != null;
+    }
+  }
+}
+      </div>
+
+      <p style="font-size:0.85rem">Depois clique em <strong>"Publicar"</strong>. As regras ficam ativas em segundos.</p>
+
+      <div class="alert alert-warn">
+        ⚠️ Se o projeto está em modo produção com as regras padrão (<code>allow read, write: if false</code>), <strong>nada funciona</strong> — nem leitura de produtos. Precisa publicar as regras acima.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CLOUDINARY ── -->
+  <div class="card">
+    <div class="card-head blue">
+      <div class="icon">☁️</div>
+      <div>
+        <h2>Cloudinary — Como liberar o upload</h2>
+        <p>Passo a passo para criar o preset não-assinado</p>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div class="alert alert-info">
+        ℹ️ O upload de imagens pelo navegador (sem backend) exige um <strong>Upload Preset "Unsigned"</strong>. Sem isso, qualquer tentativa de upload retorna erro 401.
+      </div>
+
+      <div class="step-row"><span class="step-num">1</span>
+        <div>Acesse <strong>cloudinary.com</strong> → faça login → vá em <strong>Settings</strong> (ícone ⚙️ no topo)</div>
+      </div>
+
+      <div class="step-row"><span class="step-num">2</span>
+        <div>Clique na aba <strong>"Upload"</strong></div>
+      </div>
+
+      <div class="step-row"><span class="step-num">3</span>
+        <div>Role a página até <strong>"Upload presets"</strong> → clique em <strong>"Add upload preset"</strong></div>
+      </div>
+
+      <div class="step-row"><span class="step-num">4</span>
+        <div>Na opção <strong>"Signing Mode"</strong>, selecione <strong>"Unsigned"</strong> ← isso é obrigatório!</div>
+      </div>
+
+      <div class="step-row"><span class="step-num">5</span>
+        <div>Anote o <strong>Preset name</strong> que aparece (ex: <code>ml_default</code> ou qualquer nome)<br>
+        Pode deixar as outras opções padrão e clicar em <strong>"Save"</strong></div>
+      </div>
+
+      <div class="step-row"><span class="step-num">6</span>
+        <div>No Dashboard do Cloudinary, copie o <strong>Cloud name</strong> (ex: <code>dxyz123abc</code>)</div>
+      </div>
+
+      <div class="step-row"><span class="step-num">7</span>
+        <div>Abra o arquivo <code>js/firebase-config.js</code> e preencha:
+        <div class="rules-box" style="margin-top:8px">
+<span class="kw">export const</span> CLOUDINARY_CONFIG = {
+  cloudName:    <span class="str">"dxyz123abc"</span>,    <span class="cm">// ← seu Cloud name</span>
+  uploadPreset: <span class="str">"ml_default"</span>     <span class="cm">// ← nome do preset criado</span>
+};
+        </div>
+        </div>
+      </div>
+
+      <div class="alert alert-ok">
+        ✅ Com isso, ao fazer upload de foto no painel admin, a imagem vai direto para o Cloudinary e a URL é salva no Firestore automaticamente.
+      </div>
+
+      <h3>⚠️ CORS — se o upload falhar com erro de rede:</h3>
+      <p style="font-size:0.88rem">Vá em Cloudinary → <strong>Settings → Security</strong> → em <strong>"Allowed fetch domains"</strong> adicione o domínio do seu site (ex: <code>cocina-brasilena.vercel.app</code>). Se o campo estiver vazio, qualquer domínio é permitido — deixe vazio para simplificar.</p>
+
+    </div>
+  </div>
+
+  <!-- ── DOMÍNIO AUTORIZADO ── -->
+  <div class="card">
+    <div class="card-head green">
+      <div class="icon">🌐</div>
+      <div>
+        <h2>Autorizar domínio no Firebase (obrigatório!)</h2>
+        <p>Sem isso o login não funciona mesmo com e-mail e senha corretos</p>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div class="step-row"><span class="step-num">1</span>
+        <div>Firebase Console → <strong>Authentication</strong></div>
+      </div>
+      <div class="step-row"><span class="step-num">2</span>
+        <div>Clique na aba <strong>"Settings"</strong> (ao lado de "Users")</div>
+      </div>
+      <div class="step-row"><span class="step-num">3</span>
+        <div>Em <strong>"Authorized domains"</strong> clique em <strong>"Add domain"</strong></div>
+      </div>
+      <div class="step-row"><span class="step-num">4</span>
+        <div>Adicione cada um desses domínios separadamente:
+          <ul style="margin-top:8px">
+            <li><code>localhost</code> — para testar localmente</li>
+            <li><code>cocina-brasilena.vercel.app</code> — domínio do Vercel (substitua pelo seu)</li>
+            <li><code>seudominio.com</code> — se tiver domínio próprio</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="alert alert-warn">
+        ⚠️ <code>localhost</code> geralmente já vem autorizado. Mas o domínio do Vercel você precisa adicionar manualmente toda vez que fizer deploy em um novo projeto.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── CHECKLIST ── -->
+  <div class="card">
+    <div class="card-head green">
+      <div class="icon">✅</div>
+      <div>
+        <h2>Checklist — Tudo pronto para funcionar</h2>
+        <p>Marque cada item antes de testar</p>
+      </div>
+    </div>
+    <div class="card-body">
+      <ul style="list-style:none;padding:0">
+        <li style="padding:9px 0;border-bottom:1px solid #f0f0f0">☐ Regras do Firestore publicadas (não mais <code>allow read, write: if false</code>)</li>
+        <li style="padding:9px 0;border-bottom:1px solid #f0f0f0">☐ Usuário admin criado em Authentication → Users</li>
+        <li style="padding:9px 0;border-bottom:1px solid #f0f0f0">☐ Domínio do Vercel autorizado em Authentication → Settings → Authorized domains</li>
+        <li style="padding:9px 0;border-bottom:1px solid #f0f0f0">☐ Cloudinary: preset "Unsigned" criado</li>
+        <li style="padding:9px 0;border-bottom:1px solid #f0f0f0">☐ <code>firebase-config.js</code> com cloudName e uploadPreset corretos</li>
+        <li style="padding:9px 0;border-bottom:1px solid #f0f0f0">☐ Arquivos atualizados no GitHub (versão v6)</li>
+        <li style="padding:9px 0">☐ Testei login em <code>seusite.com/admin</code> — entrou com sucesso</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

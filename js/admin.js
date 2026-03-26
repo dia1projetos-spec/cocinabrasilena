@@ -1,20 +1,19 @@
 // =============================================
 // COCINA BRASILEÑA — ADMIN JS
 // =============================================
-import { db, CLOUDINARY_CONFIG } from './firebase-config.js';
+import { db, auth, CLOUDINARY_CONFIG } from './firebase-config.js';
 import {
   collection, getDocs, addDoc, deleteDoc, doc,
   setDoc, onSnapshot, updateDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
-  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+  signInWithEmailAndPassword, signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-const auth = getAuth();
 
 // ─── AUTH ────────────────────────────────────────
 const loginPage = document.getElementById('login-page');
 const adminPage = document.getElementById('admin-page');
+const loginBtn  = document.querySelector('.btn-login');
 
 onAuthStateChanged(auth, user => {
   if (user) {
@@ -29,19 +28,34 @@ onAuthStateChanged(auth, user => {
 
 document.getElementById('login-form')?.addEventListener('submit', async e => {
   e.preventDefault();
-  const email = document.getElementById('login-email').value;
+  const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
   const errEl = document.getElementById('login-error');
+
   errEl.style.display = 'none';
+  if (loginBtn) { loginBtn.textContent = 'Entrando...'; loginBtn.disabled = true; }
+
   try {
     await signInWithEmailAndPassword(auth, email, pass);
   } catch (err) {
     errEl.style.display = 'block';
-    errEl.textContent = 'E-mail ou senha incorretos.';
+    const codes = {
+      'auth/invalid-credential':    'E-mail ou senha incorretos.',
+      'auth/user-not-found':        'Usuário não encontrado.',
+      'auth/wrong-password':        'Senha incorreta.',
+      'auth/invalid-email':         'E-mail inválido.',
+      'auth/too-many-requests':     'Muitas tentativas. Aguarde alguns minutos.',
+      'auth/network-request-failed':'Sem conexão. Verifique sua internet.',
+    };
+    errEl.textContent = codes[err.code] || `Erro: ${err.code}`;
+  } finally {
+    if (loginBtn) { loginBtn.textContent = '🔑 Entrar'; loginBtn.disabled = false; }
   }
 });
 
-document.getElementById('btn-logout')?.addEventListener('click', () => signOut(auth));
+document.getElementById('btn-logout')?.addEventListener('click', () => {
+  if (confirm('Deseja sair do painel?')) signOut(auth);
+});
 
 // ─── NAVIGATION ─────────────────────────────────
 function showPanel(id) {
