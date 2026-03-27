@@ -1,49 +1,213 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Colégio Ilha Brasil</title>
-    <link rel="stylesheet" href="css/style.css?v=20260114-1500">
-    <link rel="stylesheet" href="css/login.css?v=20260114-1500">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cocina Brasileña — Comida por Pedido</title>
+  <meta name="description" content="Os melhores sabores do Brasil, fresquinhos e entregues para você.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇧🇷</text></svg>">
+  <link rel="stylesheet" href="css/style.css?v=1.7">
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-box">
-            <div class="logo-container">
-                <img src="assets/images/logo.png" alt="Colégio Ilha Brasil" class="logo">
-            </div>
-            
-            <h1>Bem-vindo!</h1>
-            <p class="subtitle">Faça login para acessar o sistema</p>
-            
-            <form id="loginForm" class="login-form">
-                <div class="form-group">
-                    <label for="email">E-mail</label>
-                    <input type="email" id="email" name="email" required placeholder="seu@email.com">
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Senha</label>
-                    <input type="password" id="password" name="password" required placeholder="••••••••">
-                </div>
-                
-                <div id="errorMessage" class="error-message"></div>
-                
-                <button type="submit" class="btn-login" id="btnLogin">
-                    <span id="btnText">Entrar</span>
-                    <span id="btnLoader" class="loader" style="display: none;"></span>
-                </button>
-            </form>
-            
-            <div class="login-footer">
-                <p>Esqueceu sua senha? <a href="#" id="forgotPassword">Clique aqui</a></p>
-            </div>
-        </div>
+
+<!-- ═══════════════════════════════════════════
+     LOADING SCREEN
+══════════════════════════════════════════════ -->
+<div id="loading-screen">
+
+  <!-- Partículas flutuantes -->
+  <div class="loading-particles" id="loading-particles"></div>
+
+  <!-- Logo animado -->
+  <div class="loading-logo-wrap">
+    <img src="img/logo.png" alt="Cocina Brasileña" class="loading-logo-img" id="loading-logo">
+    <div class="loading-logo-glow"></div>
+  </div>
+
+  <!-- Barra de progresso -->
+  <div class="loading-bar-wrap">
+    <div class="loading-bar"></div>
+  </div>
+  <div class="loading-dots">Carregando</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     STATUS BANNER
+══════════════════════════════════════════════ -->
+<div id="status-banner"></div>
+
+<!-- ═══════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="header-top">
+    <div class="logo-wrap">
+      <img class="logo-img" src="" alt="Logo" style="display:none" onerror="this.style.display='none'">
+      <div class="logo-name">
+        Cocina Brasileña
+        <small>Comida por Pedido</small>
+      </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script type="module" src="js/firebase-config.js?v=20260114-1500"></script>
-    <script type="module" src="js/login.js?v=20260114-1500"></script>
+    <div class="header-actions">
+      <button class="btn-cart" title="Carrinho">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="btn-cart-label">Carrinho</span>
+        <span class="cart-count">0</span>
+      </button>
+      <!-- Hamburger -->
+      <button class="btn-hamburger" id="btn-hamburger" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="main-nav" id="main-nav">
+    <ul>
+      <li><a href="#inicio" class="active">Início</a></li>
+      <li><a href="#cardapio">Cardápio</a></li>
+      <li><a href="#sobre">Sobre</a></li>
+    </ul>
+  </nav>
+  <!-- Overlay mobile para fechar o menu -->
+  <div class="nav-overlay" id="nav-overlay"></div>
+</header>
+
+<!-- ═══════════════════════════════════════════
+     HERO SLIDER
+══════════════════════════════════════════════ -->
+<section id="inicio" class="hero-slider">
+  <div class="slides-track"></div>
+  <button class="slider-btn prev">&#8249;</button>
+  <button class="slider-btn next">&#8250;</button>
+  <div class="slider-dots"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     PRODUCTS
+══════════════════════════════════════════════ -->
+<section id="cardapio" class="products-section">
+  <div class="section-title">
+    <h2>Nosso Cardápio</h2>
+    <p>Feito com amor, sabor e muito tempero brasileiro 🌶️</p>
+  </div>
+
+  <div class="categories-bar">
+    <button class="cat-btn active" data-cat="todos" onclick="filterProducts('todos')">Todos</button>
+  </div>
+
+  <div id="products-grid" class="products-grid">
+    <!-- produtos carregados via JS -->
+    <div style="grid-column:1/-1;text-align:center;padding:60px;color:#888">
+      <div style="font-size:2.5rem;margin-bottom:12px">🍽️</div>
+      <p>Carregando cardápio...</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SOBRE
+══════════════════════════════════════════════ -->
+<section id="sobre" style="background:var(--azul);color:#fff;padding:60px 5%;text-align:center">
+  <h2 style="font-family:var(--font-display);font-size:2rem;margin-bottom:16px;color:var(--amarelo)">Nossa História</h2>
+  <p style="max-width:600px;margin:0 auto;opacity:0.85;line-height:1.7">
+    A Cocina Brasileña nasceu da paixão pelos sabores autênticos do Brasil.
+    Cada prato é preparado com ingredientes frescos e muito carinho,
+    trazendo o melhor da culinária brasileira diretamente para sua mesa.
+    🇧🇷❤️
+  </p>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-logo">Cocina Brasileña</div>
+  <p>Comida por Pedido · Feito com 💚💛 do Brasil</p>
+  <p style="margin-top:8px;font-size:0.78rem;opacity:0.5">© 2025 Cocina Brasileña. Todos os direitos reservados.</p>
+  <a href="admin/index.html" class="footer-admin-link" title="Área administrativa">⚙️ Admin</a>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     CART OVERLAY
+══════════════════════════════════════════════ -->
+<div id="cart-overlay" class="cart-overlay"></div>
+
+<!-- ═══════════════════════════════════════════
+     CART DRAWER
+══════════════════════════════════════════════ -->
+<aside id="cart-drawer">
+  <div class="cart-header">
+    <h3>🛒 Meu Carrinho</h3>
+    <button class="cart-close">✕</button>
+  </div>
+  <div id="cart-items" class="cart-items"></div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span>Total do pedido</span>
+      <span id="cart-total-value" class="cart-total-value">R$ 0,00</span>
+    </div>
+    <button class="btn-checkout">
+      📲 Finalizar Pedido via WhatsApp
+    </button>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════
+     CHECKOUT MODAL
+══════════════════════════════════════════════ -->
+<div id="checkout-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📋 Dados para Entrega</h3>
+      <p>Preencha suas informações para finalizar o pedido</p>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>👤 Seu Nome</label>
+        <input id="cust-name" type="text" placeholder="Nome completo" required>
+      </div>
+      <div class="form-group">
+        <label>📱 WhatsApp</label>
+        <input id="cust-wpp" type="tel" placeholder="(99) 99999-9999" required>
+      </div>
+      <div class="form-group">
+        <label>📍 Endereço de Entrega</label>
+        <div class="address-row">
+          <input id="cust-rua" type="text" placeholder="Nome da rua / avenida" required>
+          <input id="cust-num" type="text" placeholder="Número" required>
+        </div>
+        <div style="margin-top:10px">
+          <input id="cust-bairro" type="text" placeholder="Bairro" required>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel">Voltar</button>
+      <button class="btn-confirm">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 0C5.373 0 0 5.373 0 12c0 2.117.554 4.1 1.523 5.82L0 24l6.335-1.51A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.806 9.806 0 01-4.994-1.366l-.358-.214-3.762.898.936-3.673-.234-.376A9.808 9.808 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.429 0 9.818 4.388 9.818 9.818 0 5.43-4.39 9.818-9.819 9.818z"/></svg>
+        Enviar pelo WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     LIGHTBOX
+══════════════════════════════════════════════ -->
+<div id="lightbox">
+  <div class="lightbox-inner">
+    <img id="lightbox-img" src="" alt="Imagem ampliada">
+    <button class="lightbox-close">✕</button>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- ═══════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════ -->
+<script type="module" src="js/main.js?v=1.7"></script>
 </body>
 </html>

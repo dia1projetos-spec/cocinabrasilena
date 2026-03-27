@@ -1,203 +1,133 @@
-# 🏫 Sistema Colégio Ilha Brasil
+# 🇧🇷 Cocina Brasileña — Sistema de Pedidos
 
-Sistema de gerenciamento escolar completo desenvolvido para o Colégio Ilha Brasil.
+Site premium de pedidos online com painel administrativo completo.
 
-## 📋 Funcionalidades
-
-### Dashboard do Diretor (Administrador)
-- ✅ Login automático (detecta tipo de usuário)
-- ✅ Cadastro de Professores (nome, email, senha)
-- ✅ Cadastro de Alunos (nome, turma, responsável com credenciais)
-- ✅ Gestão de Turmas
-- ✅ Visão geral com estatísticas
-- ✅ Interface responsiva e moderna
-
-### Tecnologias Utilizadas
-- HTML5
-- CSS3 (Design System com cores institucionais)
-- JavaScript ES6+ (Modules)
-- Firebase Authentication
-- Firebase Firestore
-- Vercel (Deploy)
-
-## 🚀 Como Configurar
-
-### 1. Configurar Firebase
-
-1. Acesse o [Firebase Console](https://console.firebase.google.com/)
-2. Crie um novo projeto ou use um existente
-3. Ative o **Authentication** com método de login por E-mail/Senha
-4. Ative o **Firestore Database** (modo produção ou teste)
-5. Copie as credenciais do projeto
-
-### 2. Configurar Credenciais
-
-Edite o arquivo `js/firebase-config.js` e substitua pelas suas credenciais:
-
-```javascript
-const firebaseConfig = {
-    apiKey: "SUA_API_KEY_AQUI",
-    authDomain: "SEU_PROJECT_ID.firebaseapp.com",
-    projectId: "SEU_PROJECT_ID",
-    storageBucket: "SEU_PROJECT_ID.appspot.com",
-    messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-    appId: "SEU_APP_ID"
-};
-```
-
-### 3. Criar Primeiro Diretor
-
-Como o sistema exige que os cadastros sejam feitos pelo diretor, você precisa criar manualmente a primeira conta de diretor:
-
-1. No Firebase Console, vá em **Authentication**
-2. Clique em "Add user"
-3. Adicione o e-mail e senha do diretor
-4. Copie o **User UID** gerado
-5. Vá em **Firestore Database**
-6. Crie uma collection chamada `diretores`
-7. Adicione um documento com o UID copiado e os campos:
-   ```
-   nome: "Nome do Diretor"
-   email: "email@diretor.com"
-   dataCadastro: (timestamp atual)
-   status: "ativo"
-   ```
-
-### 4. Regras de Segurança do Firestore
-
-Configure as regras de segurança no Firestore:
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    
-    // Diretores
-    match /diretores/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Professores
-    match /professores/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && exists(/databases/$(database)/documents/diretores/$(request.auth.uid));
-    }
-    
-    // Alunos
-    match /alunos/{alunoId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && exists(/databases/$(database)/documents/diretores/$(request.auth.uid));
-    }
-    
-    // Responsáveis
-    match /responsaveis/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if request.auth != null && exists(/databases/$(database)/documents/diretores/$(request.auth.uid));
-    }
-    
-    // Turmas
-    match /turmas/{turmaId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && exists(/databases/$(database)/documents/diretores/$(request.auth.uid));
-    }
-    
-    // Atividades
-    match /atividades/{atividadeId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-    }
-  }
-}
-```
-
-## 🌐 Deploy no Vercel
-
-### Via GitHub
-
-1. Faça push do código para seu repositório GitHub
-2. Acesse [Vercel](https://vercel.com)
-3. Clique em "Import Project"
-4. Selecione seu repositório
-5. Configure:
-   - Framework Preset: Other
-   - Build Command: (deixe vazio)
-   - Output Directory: ./
-6. Clique em "Deploy"
-
-### Configurar Domínio
-
-Depois do deploy, você pode configurar um domínio personalizado nas configurações do projeto no Vercel.
+---
 
 ## 📁 Estrutura do Projeto
 
 ```
-colegio-ilha-brasil/
-├── assets/
-│   └── images/
-│       └── logo.png
+cocina-brasilena/
+├── index.html              ← Site principal (público)
+├── admin/
+│   └── index.html          ← Painel administrativo
 ├── css/
-│   ├── style.css
-│   ├── login.css
-│   └── dashboard.css
+│   ├── style.css           ← Estilos do site principal
+│   └── admin.css           ← Estilos do painel admin
 ├── js/
-│   ├── firebase-config.js
-│   ├── login.js
-│   └── dashboard-diretor.js
-├── index.html
-├── dashboard-diretor.html
-└── README.md
+│   ├── firebase-config.js  ← ⚠️ CONFIGURAR com suas credenciais
+│   ├── main.js             ← JS principal do site
+│   └── admin.js            ← JS do painel admin
+└── firestore.rules         ← Regras de segurança do Firestore
 ```
-
-## 🎨 Cores do Projeto
-
-- Verde Primário: `#00753a`
-- Verde Secundário: `#28a745`
-- Amarelo Primário: `#ffd700`
-- Amarelo Secundário: `#ffc107`
-
-## 📱 Tipos de Usuário
-
-1. **Diretor(a)** - Administrador completo
-   - Cadastra professores
-   - Cadastra alunos
-   - Gerencia turmas
-   - Acessa todas as funcionalidades
-
-2. **Professor(a)** - Em desenvolvimento
-   - Dashboard próprio (próxima fase)
-
-3. **Responsável** - Em desenvolvimento
-   - Dashboard próprio (próxima fase)
-
-## 🔒 Segurança
-
-- Autenticação via Firebase Authentication
-- Senhas criptografadas
-- Validação de tipos de usuário
-- Regras de segurança no Firestore
-- Proteção de rotas
-
-## 📝 Próximas Funcionalidades
-
-- Dashboard do Professor
-- Dashboard do Responsável
-- Edição de cadastros
-- Sistema de notas
-- Frequência
-- Comunicados
-- Calendário escolar
-
-## 🆘 Suporte
-
-Para dúvidas ou problemas:
-1. Verifique se o Firebase está configurado corretamente
-2. Confira as regras de segurança do Firestore
-3. Verifique o console do navegador para erros
-
-## 📄 Licença
-
-Sistema desenvolvido exclusivamente para o Colégio Ilha Brasil.
 
 ---
 
-Desenvolvido com 💚💛 para o Colégio Ilha Brasil
+## 🚀 Configuração Passo a Passo
+
+### 1. Firebase
+
+1. Acesse [console.firebase.google.com](https://console.firebase.google.com)
+2. Crie um projeto (ou use um existente)
+3. Vá em **Authentication** → Habilite "E-mail e Senha"
+4. Crie um usuário admin em Authentication → Users → Adicionar usuário
+5. Vá em **Firestore Database** → Criar banco de dados
+6. Copie as regras de `firestore.rules` para **Rules** no Firestore
+7. Vá em **Configurações do Projeto** → **Apps** → Adicione um Web App
+8. Copie as credenciais `firebaseConfig`
+
+### 2. Editar `js/firebase-config.js`
+
+Substitua os valores de `firebaseConfig`:
+
+```javascript
+const firebaseConfig = {
+  apiKey: "SUA_API_KEY_AQUI",
+  authDomain: "seu-projeto.firebaseapp.com",
+  projectId: "seu-projeto",
+  storageBucket: "seu-projeto.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abc123"
+};
+```
+
+### 3. Cloudinary (para imagens)
+
+1. Acesse [cloudinary.com](https://cloudinary.com) e crie uma conta gratuita
+2. Vá em **Settings** → **Upload** → **Upload presets**
+3. Clique em **Add upload preset**
+4. Defina **Signing Mode** como `Unsigned`
+5. Anote o **Preset name** e o **Cloud name**
+
+No arquivo `js/firebase-config.js`:
+
+```javascript
+export const CLOUDINARY_CONFIG = {
+  cloudName: "seu-cloud-name",
+  uploadPreset: "seu-preset-name"
+};
+```
+
+### 4. Deploy no GitHub + Vercel
+
+1. Crie um repositório no GitHub e faça upload de todos os arquivos
+2. Acesse [vercel.com](https://vercel.com) → Login com GitHub
+3. Clique em "New Project" → selecione seu repositório
+4. Clique em "Deploy" (sem build settings necessários)
+5. Seu domínio personalizado pode ser configurado nas configurações do projeto no Vercel
+
+---
+
+## ⚙️ Funcionalidades
+
+### Site Principal (`index.html`)
+- 🏳️ Tela de carregamento com bandeira do Brasil animada + som de berimbau
+- 🖼️ Slider de banners gerenciável pelo admin
+- 🟢 Banner de status (Abierto / Cerrado) em destaque
+- 🍽️ Grid de produtos com filtro por categoria
+- 🔍 Lightbox para ver imagens em tela cheia
+- 🛒 Carrinho lateral com somatório automático
+- 📲 Finalização de pedido via WhatsApp com todos os dados
+
+### Painel Admin (`admin/index.html`)
+- 🔐 Login com Firebase Authentication
+- 🏪 Upload e remoção de logo (via Cloudinary)
+- 🖼️ Gerenciamento de slides do banner
+- 🟢 Controle de status (Abierto / Cerrado) com mensagem personalizada
+- 🍽️ CRUD completo de produtos (nome, preço, foto, categoria, descrição, badge)
+- ✅ Ativar/desativar produtos sem excluir
+- 🔄 Todas as alterações refletem em tempo real no site
+
+---
+
+## 📱 WhatsApp de Pedidos
+
+Os pedidos finalizados são enviados para:
+**+55 13 98176-3452**
+
+Mensagem gerada automaticamente com:
+- Nome do cliente
+- WhatsApp do cliente
+- Endereço (rua, número, bairro)
+- Lista de itens com quantidades e preços
+- Total do pedido
+
+---
+
+## 🎨 Design
+
+- **Cores**: Verde (#009C3B), Amarelo (#FFDF00), Azul (#002776) — cores da bandeira do Brasil
+- **Fontes**: Playfair Display (display), Nunito (texto), Dancing Script (logo)
+- **Estilo**: Premium tropical brasileiro
+
+---
+
+## 🛠️ Tecnologias
+
+- HTML5 + CSS3 + JavaScript (ES Modules)
+- Firebase Firestore (banco de dados em tempo real)
+- Firebase Authentication (login admin)
+- Cloudinary (hospedagem de imagens)
+- Web Audio API (som de berimbau)
+- Vercel (hospedagem)
+- GitHub (repositório)
