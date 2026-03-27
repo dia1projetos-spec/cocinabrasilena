@@ -1,28 +1,24 @@
-// =============================================
-// FIREBASE CONFIGURATION
-// Substitua com suas credenciais do Firebase
-// =============================================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+// Firebase Configuration
+// Credenciais do projeto Colégio Ilha Brasil
+
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getStorage } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
 const firebaseConfig = {
-  apiKey:            "AIzaSyBfxMRk_UdCBZkg60omMZnh1WZH5FJ04FI",
-  authDomain:        "cocina-brasilena.firebaseapp.com",
-  projectId:         "cocina-brasilena",
-  storageBucket:     "cocina-brasilena.firebasestorage.app",
-  messagingSenderId: "807151796377",
-  appId:             "1:807151796377:web:695aefc66e558952683808"
+    apiKey: "AIzaSyDUJF4Aa_g159ZtEcVaS8JbISlikG5eDHY",
+    authDomain: "colegio-ilha-brasil.firebaseapp.com",
+    projectId: "colegio-ilha-brasil",
+    storageBucket: "colegio-ilha-brasil.firebasestorage.app",
+    messagingSenderId: "412452991728",
+    appId: "1:412452991728:web:e7891470a7ccb8e7324835"
 };
 
+// Inicializa Firebase
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export const auth = getAuth(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-// =============================================
-// CLOUDINARY CONFIGURATION
-// =============================================
-export const CLOUDINARY_CONFIG = {
-  cloudName: "SEU_CLOUD_NAME",
-  uploadPreset: "SEU_UPLOAD_PRESET" // unsigned preset
-};
+export { auth, db, storage, firebaseConfig };
