@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Cocina Brasileña</title>
-  <link rel="stylesheet" href="../css/admin.css?v=1.7">
+  <link rel="stylesheet" href="../css/admin.css?v=1.8">
 </head>
 <body>
 
@@ -30,7 +30,7 @@
     </form>
 
     <p style="margin-top:20px;font-size:0.8rem;color:#aaa">
-      <a href="../index.html" style="color:#009C3B;font-weight:700">← Voltar ao site</a>
+      <a href="../index.html" style="color:#009C3B;font-weight:700">← Volver al sitio</a>
     </p>
   </div>
 </div>
@@ -44,24 +44,24 @@
   <aside class="sidebar">
     <div class="sidebar-brand">
       Cocina Brasileña
-      <small>Painel Admin</small>
+      <small>Panel Admin</small>
     </div>
 
     <nav>
       <ul>
         <li><a href="#" data-panel="panel-dashboard">🏠 Dashboard</a></li>
-        <li><a href="#" data-panel="panel-status">🟢 Status da Loja</a></li>
+        <li><a href="#" data-panel="panel-status">🟢 Estado del Local</a></li>
         <li><a href="#" data-panel="panel-logo">🏪 Logo</a></li>
         <li><a href="#" data-panel="panel-slides">🖼️ Slides / Banner</a></li>
-        <li><a href="#" data-panel="panel-products">🍽️ Produtos</a></li>
+        <li><a href="#" data-panel="panel-products">🍽️ Productos</a></li>
       </ul>
     </nav>
 
     <div class="sidebar-logout">
       <a href="../index.html" style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:10px;">
-        🌐 Ver Site
+        🌐 Ver Sitio
       </a>
-      <button class="btn-logout" id="btn-logout">🚪 Sair</button>
+      <button class="btn-logout" id="btn-logout">🚪 Salir</button>
     </div>
   </aside>
 
@@ -76,12 +76,12 @@
         <div class="card" style="text-align:center">
           <div style="font-size:2.5rem;margin-bottom:8px">🍽️</div>
           <div style="font-size:1.8rem;font-weight:900;color:var(--azul)" id="dash-prod-count">—</div>
-          <div style="color:#888;font-size:0.85rem">Produtos Cadastrados</div>
+          <div style="color:#888;font-size:0.85rem">Productos Registrados</div>
         </div>
         <div class="card" style="text-align:center">
           <div style="font-size:2.5rem;margin-bottom:8px">🖼️</div>
           <div style="font-size:1.8rem;font-weight:900;color:var(--azul)" id="dash-slides-count">—</div>
-          <div style="color:#888;font-size:0.85rem">Slides no Banner</div>
+          <div style="color:#888;font-size:0.85rem">Slides en el Banner</div>
         </div>
         <div class="card" style="text-align:center">
           <div style="font-size:2.5rem;margin-bottom:8px">🇧🇷</div>
@@ -91,25 +91,25 @@
       </div>
 
       <div class="card">
-        <h4>🚀 Bem-vindo ao Painel Admin</h4>
+        <h4>🚀 Bem-vindo ao Panel Admin</h4>
         <p style="color:#888;font-size:0.9rem;line-height:1.6">
-          Use o menu lateral para gerenciar sua loja. Você pode atualizar o logo, controlar o banner de slides,
-          cadastrar e remover produtos, e definir se a loja está aberta ou fechada.
-          Todas as alterações aparecem automaticamente no site!
+          Usá el menú lateral para gestionar tu local. Você pode atualizar o logo, controlar o banner de slides,
+          cargar y eliminar productos, e definir se a loja está aberta ou fechada.
+          Todos los cambios aparecen automáticamente en el sitio!
         </p>
       </div>
     </div>
 
     <!-- ─── STATUS ────────────────────────────── -->
     <div id="panel-status" class="admin-panel">
-      <h2 class="panel-title">🟢 Status da Loja</h2>
+      <h2 class="panel-title">🟢 Estado del Local</h2>
 
       <div class="card">
-        <h4>📢 Situação Atual</h4>
+        <h4>📢 Situación Actual</h4>
         <div class="status-card">
           <div class="status-info">
-            <h4>Aberto ou Fechado?</h4>
-            <p>O status selecionado aparece em destaque no topo do site para os clientes.</p>
+            <h4>Abierto o Cerrado?</h4>
+            <p>El estado seleccionado aparece destacado en la parte superior del sitio.</p>
           </div>
           <div class="toggle-group">
             <button class="btn-aberto">✅ ABIERTO</button>
@@ -119,34 +119,34 @@
       </div>
 
       <div class="card">
-        <h4>✏️ Mensagem Personalizada (opcional)</h4>
+        <h4>✏️ Mensaje Personalizado (opcional)</h4>
         <div class="form-group">
-          <label>Mensagem que aparece no banner</label>
-          <input id="status-message" type="text" placeholder="Ex: 🟢 Estamos abertos! Pedidos até as 22h">
+          <label>Mensaje que aparece en el banner</label>
+          <input id="status-message" type="text" placeholder="Ex: 🟢 ¡Estamos abiertos! Pedidos hasta las 22hs">
         </div>
         <p style="color:#888;font-size:0.82rem;margin-top:6px">
-          Se vazio, uma mensagem padrão será exibida. Clique em ABIERTO ou CERRADO para salvar.
+          Si está vacío, se mostrará un mensaje predeterminado. Hacé clic en ABIERTO o CERRADO para guardar.
         </p>
       </div>
     </div>
 
     <!-- ─── LOGO ──────────────────────────────── -->
     <div id="panel-logo" class="admin-panel">
-      <h2 class="panel-title">🏪 Logo da Loja</h2>
+      <h2 class="panel-title">🏪 Logo del Local</h2>
 
       <div class="card">
-        <h4>Logo Atual</h4>
+        <h4>Logo Actual</h4>
         <div class="logo-preview-wrap" id="logo-preview">
           <div class="logo-preview-placeholder">🏪</div>
-          <p style="color:#888;font-size:0.85rem">Nenhum logo cadastrado</p>
+          <p style="color:#888;font-size:0.85rem">Ningún logo registrado</p>
         </div>
       </div>
 
       <div class="card">
-        <h4>📤 Enviar Novo Logo</h4>
+        <h4>📤 Subir Nuevo Logo</h4>
         <div class="img-upload-zone" id="logo-upload-zone">
           <div class="icon">🖼️</div>
-          <p>Clique ou arraste uma imagem aqui</p>
+          <p>Hacé clic o arrastrá una imagen aquí</p>
           <p style="font-size:0.78rem;margin-top:4px">PNG, JPG ou WEBP · Recomendado: 200×200px</p>
           <input type="file" id="logo-file" accept="image/*">
           <div class="upload-progress">
@@ -162,11 +162,11 @@
       <h2 class="panel-title">🖼️ Slides / Banner</h2>
 
       <div class="card">
-        <h4>➕ Adicionar Slide</h4>
+        <h4>➕ Agregar Slide</h4>
         <form id="slide-form">
           <div class="img-upload-zone" id="slide-img-zone">
             <div class="icon">📷</div>
-            <p>Clique ou arraste a imagem do slide</p>
+            <p>Hacé clic o arrastrá la imagen del slide</p>
             <p style="font-size:0.78rem;margin-top:4px">Recomendado: 1200×500px (horizontal)</p>
             <input type="file" id="slide-img-file" accept="image/*">
             <div class="upload-progress">
@@ -178,8 +178,8 @@
 
           <div class="form-row" style="margin-top:16px">
             <div class="form-group">
-              <label>Título do Slide</label>
-              <input id="slide-title" type="text" placeholder="Ex: Promo de Segunda!">
+              <label>Título del Slide</label>
+              <input id="slide-title" type="text" placeholder="Ej: ¡Promo del Lunes!">
             </div>
             <div class="form-group">
               <label>Subtítulo</label>
@@ -187,31 +187,31 @@
             </div>
           </div>
 
-          <button type="submit" class="btn-primary">➕ Adicionar Slide</button>
+          <button type="submit" class="btn-primary">➕ Agregar Slide</button>
         </form>
       </div>
 
       <div class="card">
-        <h4>📋 Slides Cadastrados</h4>
+        <h4>📋 Slides Registrados</h4>
         <div id="slides-list" class="slides-list">
-          <p style="color:#888;font-size:0.875rem">Carregando...</p>
+          <p style="color:#888;font-size:0.875rem">Cargando...</p>
         </div>
       </div>
     </div>
 
     <!-- ─── PRODUCTS ──────────────────────────── -->
     <div id="panel-products" class="admin-panel">
-      <h2 class="panel-title">🍽️ Gerenciar Produtos</h2>
+      <h2 class="panel-title">🍽️ Gestionar Productos</h2>
 
       <div class="card">
-        <h4>➕ Adicionar Produto</h4>
+        <h4>➕ Agregar Producto</h4>
         <form id="product-form">
           <!-- Imagem -->
           <div class="form-group">
-            <label>Foto do Produto</label>
+            <label>Foto del Producto</label>
             <div class="img-upload-zone" id="product-img-zone">
               <div class="icon">🍽️</div>
-              <p>Clique ou arraste a foto do produto</p>
+              <p>Hacé clic o arrastrá la foto del producto</p>
               <p style="font-size:0.78rem;margin-top:4px">Recomendado: 400×300px</p>
               <input type="file" id="product-img-file" accept="image/*">
               <div class="upload-progress">
@@ -225,53 +225,53 @@
           <!-- Nome e Preço -->
           <div class="form-row">
             <div class="form-group">
-              <label>Nome do Produto *</label>
-              <input id="prod-name" type="text" placeholder="Ex: Feijoada Completa" required>
+              <label>Nombre del Producto *</label>
+              <input id="prod-name" type="text" placeholder="Ej: Feijoada Completa" required>
             </div>
             <div class="form-group">
-              <label>Preço (R$) *</label>
+              <label>Precio ($) *</label>
               <input id="prod-price" type="number" step="0.01" min="0" placeholder="0,00" required>
             </div>
           </div>
 
-          <!-- Categoria e Badge -->
+          <!-- Categoría e Badge -->
           <div class="form-row">
             <div class="form-group">
-              <label>Categoria</label>
-              <input id="prod-cat" type="text" placeholder="Ex: Pratos, Bebidas, Sobremesas">
+              <label>Categoría</label>
+              <input id="prod-cat" type="text" placeholder="Ej: Platos, Bebidas, Postres">
             </div>
             <div class="form-group">
-              <label>Badge / Etiqueta</label>
-              <input id="prod-badge" type="text" placeholder="Ex: Novo, Destaque, Promo">
+              <label>Etiqueta</label>
+              <input id="prod-badge" type="text" placeholder="Ej: Nuevo, Destacado, Promo">
             </div>
           </div>
 
-          <!-- Descrição -->
+          <!-- Descripción -->
           <div class="form-group">
-            <label>Descrição</label>
-            <textarea id="prod-desc" rows="3" placeholder="Descreva os ingredientes, sabores e diferenciais do produto..."></textarea>
+            <label>Descripción</label>
+            <textarea id="prod-desc" rows="3" placeholder="Describí los ingredientes, sabores y características del producto..."></textarea>
           </div>
 
-          <button type="submit" class="btn-primary">✅ Salvar Produto</button>
+          <button type="submit" class="btn-primary">✅ Guardar Producto</button>
         </form>
       </div>
 
       <div class="card">
-        <h4>📋 Produtos Cadastrados</h4>
+        <h4>📋 Productos Registrados</h4>
         <div style="overflow-x:auto">
           <table class="products-table">
             <thead>
               <tr>
                 <th>Foto</th>
                 <th>Nome</th>
-                <th>Categoria</th>
+                <th>Categoría</th>
                 <th>Preço</th>
                 <th>Status</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody id="products-tbody">
-              <tr><td colspan="6" style="text-align:center;padding:40px;color:#888">Carregando...</td></tr>
+              <tr><td colspan="6" style="text-align:center;padding:40px;color:#888">Cargando...</td></tr>
             </tbody>
           </table>
         </div>
@@ -284,6 +284,6 @@
 <!-- TOASTS -->
 <div id="toast-container" class="toast-container"></div>
 
-<script type="module" src="../js/admin.js?v=1.7"></script>
+<script type="module" src="../js/admin.js?v=1.8"></script>
 </body>
 </html>

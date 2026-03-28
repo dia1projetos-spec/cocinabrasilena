@@ -40,12 +40,12 @@ document.getElementById('login-form')?.addEventListener('submit', async e => {
   } catch (err) {
     errEl.style.display = 'block';
     const codes = {
-      'auth/invalid-credential':    'E-mail ou senha incorretos.',
+      'auth/invalid-credential':    'E-mail o contraseña incorrectos.',
       'auth/user-not-found':        'Usuário não encontrado.',
       'auth/wrong-password':        'Senha incorreta.',
       'auth/invalid-email':         'E-mail inválido.',
-      'auth/too-many-requests':     'Muitas tentativas. Aguarde alguns minutos.',
-      'auth/network-request-failed':'Sem conexão. Verifique sua internet.',
+      'auth/too-many-requests':     'Demasiados intentos. Aguarde alguns minutos.',
+      'auth/network-request-failed':'Sin conexión. Verifique sua internet.',
     };
     errEl.textContent = codes[err.code] || `Erro: ${err.code}`;
   } finally {
@@ -54,7 +54,7 @@ document.getElementById('login-form')?.addEventListener('submit', async e => {
 });
 
 document.getElementById('btn-logout')?.addEventListener('click', () => {
-  if (confirm('Deseja sair do painel?')) signOut(auth);
+  if (confirm('¿Querés salir del panel?')) signOut(auth);
 });
 
 // ─── NAVIGATION ─────────────────────────────────
@@ -136,9 +136,9 @@ function renderLogoPreview() {
   if (!wrap) return;
   wrap.innerHTML = logoUrl
     ? `<img class="logo-preview-img" src="${logoUrl}" alt="Logo">
-       <button class="btn-danger" onclick="removeLogo()">🗑️ Remover Logo</button>`
+       <button class="btn-danger" onclick="removeLogo()">🗑️ Eliminar Logo</button>`
     : `<div class="logo-preview-placeholder">🏪</div>
-       <p style="color:#888;font-size:0.85rem">Nenhum logo cadastrado</p>`;
+       <p style="color:#888;font-size:0.85rem">Ningún logo registrado</p>`;
 }
 
 window.removeLogo = async function() {
@@ -147,8 +147,8 @@ window.removeLogo = async function() {
     await setDoc(doc(db, 'config', 'logo'), { url: '' });
     logoUrl = '';
     renderLogoPreview();
-    showToast('Logo removido!');
-  } catch (e) { showToast('Erro ao remover!', 'error'); }
+    showToast('¡Logo eliminado!');
+  } catch (e) { showToast('¡Error al eliminar!', 'error'); }
 };
 
 const logoZone = document.getElementById('logo-upload-zone');
@@ -172,8 +172,8 @@ async function handleLogoFile(file) {
     await setDoc(doc(db, 'config', 'logo'), { url, updatedAt: serverTimestamp() });
     logoUrl = url;
     renderLogoPreview();
-    showToast('Logo atualizado!');
-  } catch (e) { showToast('Erro no upload: ' + e.message, 'error'); }
+    showToast('¡Logo actualizado!');
+  } catch (e) { showToast('Error en la subida: ' + e.message, 'error'); }
 }
 
 // ─── STATUS ──────────────────────────────────────
@@ -202,8 +202,8 @@ async function setStatus(status) {
     await setDoc(doc(db, 'config', 'status'), { status, message: msg, updatedAt: serverTimestamp() });
     document.querySelectorAll('.btn-aberto, .btn-cerrado').forEach(b => b.classList.remove('active'));
     document.querySelector(`.btn-${status}`)?.classList.add('active');
-    showToast(`Status atualizado: ${status.toUpperCase()}!`);
-  } catch (e) { showToast('Erro ao salvar status!', 'error'); }
+    showToast(`Estado actualizado: ${status.toUpperCase()}!`);
+  } catch (e) { showToast('¡Error al guardar el estado!', 'error'); }
 }
 
 // ─── PRODUCTS ────────────────────────────────────
@@ -224,7 +224,7 @@ function renderProductsTable() {
   if (!tbody) return;
 
   if (!products.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#888">Nenhum produto cadastrado ainda.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#888">No hay productos registrados aún.</td></tr>';
     return;
   }
 
@@ -237,7 +237,7 @@ function renderProductsTable() {
       <td>
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
           <input type="checkbox" ${p.active !== false ? 'checked' : ''} onchange="toggleProductActive('${p.id}', this.checked)">
-          <span style="font-size:0.8rem;color:#888">${p.active !== false ? 'Ativo' : 'Inativo'}</span>
+          <span style="font-size:0.8rem;color:#888">${p.active !== false ? 'Activo' : 'Inactivo'}</span>
         </label>
       </td>
       <td>
@@ -247,11 +247,11 @@ function renderProductsTable() {
 }
 
 window.deleteProduct = async function(id) {
-  if (!confirm('Excluir este produto?')) return;
+  if (!confirm('Eliminar este producto?')) return;
   try {
     await deleteDoc(doc(db, 'products', id));
-    showToast('Produto excluído!');
-  } catch (e) { showToast('Erro ao excluir!', 'error'); }
+    showToast('¡Producto eliminado!');
+  } catch (e) { showToast('¡Error al eliminar!', 'error'); }
 };
 
 window.toggleProductActive = async function(id, active) {
@@ -288,8 +288,8 @@ async function handleProductImg(file) {
         <button class="remove-img" onclick="clearProductImg()">✕</button>
       </div>`;
     }
-    showToast('Imagem enviada!');
-  } catch (e) { showToast('Erro no upload!', 'error'); }
+    showToast('¡Imagen subida!');
+  } catch (e) { showToast('Error en la subida!', 'error'); }
 }
 
 window.clearProductImg = function() {
@@ -306,7 +306,7 @@ document.getElementById('product-form')?.addEventListener('submit', async e => {
   const cat   = document.getElementById('prod-cat').value.trim();
   const badge = document.getElementById('prod-badge').value.trim();
 
-  if (!name || isNaN(price)) { showToast('Preencha nome e preço!', 'error'); return; }
+  if (!name || isNaN(price)) { showToast('¡Completá nombre y precio!', 'error'); return; }
 
   try {
     await addDoc(collection(db, 'products'), {
@@ -316,8 +316,8 @@ document.getElementById('product-form')?.addEventListener('submit', async e => {
     });
     e.target.reset();
     window.clearProductImg();
-    showToast('Produto adicionado!');
-  } catch (err) { showToast('Erro ao salvar!', 'error'); console.error(err); }
+    showToast('¡Producto agregado!');
+  } catch (err) { showToast('¡Error al guardar!', 'error'); console.error(err); }
 });
 
 // ─── SLIDES ──────────────────────────────────────
@@ -338,7 +338,7 @@ function renderSlidesList() {
   if (!list) return;
 
   if (!slides.length) {
-    list.innerHTML = '<p style="color:#888;font-size:0.875rem">Nenhum slide cadastrado ainda.</p>';
+    list.innerHTML = '<p style="color:#888;font-size:0.875rem">No hay slides registrados aún.</p>';
     return;
   }
 
@@ -346,7 +346,7 @@ function renderSlidesList() {
     <div class="slide-item">
       <img src="${s.imageUrl}" alt="${s.title || ''}">
       <div class="slide-item-body">
-        <p style="font-weight:700;font-size:0.85rem;margin-bottom:6px">${s.title || 'Sem título'}</p>
+        <p style="font-weight:700;font-size:0.85rem;margin-bottom:6px">${s.title || 'Sin título'}</p>
         <p style="font-size:0.78rem;color:#888">${s.subtitle || ''}</p>
         <div class="slide-item-actions" style="margin-top:10px">
           <button class="btn-danger" onclick="deleteSlide('${s.id}')">🗑️ Remover</button>
@@ -356,10 +356,10 @@ function renderSlidesList() {
 }
 
 window.deleteSlide = async function(id) {
-  if (!confirm('Remover este slide?')) return;
+  if (!confirm('Eliminar este slide?')) return;
   try {
     await deleteDoc(doc(db, 'slides', id));
-    showToast('Slide removido!');
+    showToast('¡Slide eliminado!');
   } catch (e) { showToast('Erro!', 'error'); }
 };
 
@@ -384,13 +384,13 @@ async function handleSlideImg(file) {
     slideImgUrl = url;
     const prev = document.getElementById('slide-img-preview');
     if (prev) prev.innerHTML = `<img src="${url}" style="max-width:200px;border-radius:8px;margin-top:8px">`;
-    showToast('Imagem do slide enviada!');
+    showToast('¡Imagen del slide subida!');
   } catch (e) { showToast('Erro!', 'error'); }
 }
 
 document.getElementById('slide-form')?.addEventListener('submit', async e => {
   e.preventDefault();
-  if (!slideImgUrl) { showToast('Envie uma imagem para o slide!', 'error'); return; }
+  if (!slideImgUrl) { showToast('¡Subí una imagen para el slide!', 'error'); return; }
   const title    = document.getElementById('slide-title').value.trim();
   const subtitle = document.getElementById('slide-subtitle').value.trim();
 
@@ -402,8 +402,8 @@ document.getElementById('slide-form')?.addEventListener('submit', async e => {
     e.target.reset();
     slideImgUrl = '';
     document.getElementById('slide-img-preview').innerHTML = '';
-    showToast('Slide adicionado!');
-  } catch (err) { showToast('Erro ao salvar!', 'error'); }
+    showToast('¡Slide agregado!');
+  } catch (err) { showToast('¡Error al guardar!', 'error'); }
 });
 
 // ─── INIT ────────────────────────────────────────

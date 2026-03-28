@@ -164,7 +164,7 @@ function addToCart(product) {
   else cart.push({ ...product, qty: 1 });
   saveCart();
   updateCartUI();
-  showToast(`🛒 ${product.name} adicionado!`);
+  showToast(`🛒 ¡${product.name} agregado!`);
   // Bump animation
   document.querySelectorAll('.cart-count').forEach(el => {
     el.classList.remove('bump');
@@ -193,8 +193,8 @@ function renderCartItems() {
   if (!container) return;
 
   if (!cart.length) {
-    container.innerHTML = `<div class="cart-empty"><div class="empty-icon">🍽️</div><p>Seu carrinho está vazio</p></div>`;
-    if (total) total.textContent = 'R$ 0,00';
+    container.innerHTML = `<div class="cart-empty"><div class="empty-icon">🍽️</div><p>Tu carrito está vacío</p></div>`;
+    if (total) total.textContent = '$ 0,00';
     return;
   }
 
@@ -203,17 +203,17 @@ function renderCartItems() {
       <img class="cart-item-img" src="${item.imageUrl || 'https://via.placeholder.com/70'}" alt="${item.name}">
       <div class="cart-item-info">
         <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-price">R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}</div>
+        <div class="cart-item-price">$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}</div>
         <div class="cart-item-controls">
           <button class="qty-btn" onclick="changeQty('${item.id}', -1)">−</button>
           <span class="qty-val">${item.qty}</span>
           <button class="qty-btn" onclick="changeQty('${item.id}', +1)">+</button>
         </div>
       </div>
-      <button class="cart-item-remove" onclick="removeFromCart('${item.id}')" title="Remover">🗑️</button>
+      <button class="cart-item-remove" onclick="removeFromCart('${item.id}')" title="Eliminar">🗑️</button>
     </div>`).join('');
 
-  if (total) total.textContent = 'R$ ' + getCartTotal().toFixed(2).replace('.', ',');
+  if (total) total.textContent = '$ ' + getCartTotal().toFixed(2).replace('.', ',');
 }
 
 // Expõe funções globalmente
@@ -261,28 +261,44 @@ function renderProducts(list) {
   if (!grid) return;
 
   if (!list.length) {
-    grid.innerHTML = '<p style="text-align:center;color:#888;padding:40px;grid-column:1/-1">Nenhum produto disponível no momento.</p>';
+    grid.innerHTML = '<p style="text-align:center;color:#888;padding:40px;grid-column:1/-1">No hay productos disponibles por el momento.</p>';
     return;
   }
 
   grid.innerHTML = list.map(p => `
     <div class="product-card">
-      <div class="product-img-wrap" onclick="openLightbox('${p.imageUrl}')">
+      <div class="product-img-wrap"
+           data-lightbox="${encodeURIComponent(p.imageUrl || '')}">
         <img src="${p.imageUrl || 'https://via.placeholder.com/400x300'}" alt="${p.name}" loading="lazy">
         ${p.badge ? `<span class="product-badge">${p.badge}</span>` : ''}
-        <button class="product-zoom-btn" title="Ver imagem">🔍</button>
+        <button class="product-zoom-btn" aria-label="Ver imagen">🔍</button>
       </div>
       <div class="product-info">
         <div class="product-name">${p.name}</div>
         <div class="product-desc">${p.description || ''}</div>
         <div class="product-footer">
-          <div class="product-price"><span>R$</span>${parseFloat(p.price).toFixed(2).replace('.', ',')}</div>
-          <button class="btn-add" onclick='addToCart(${JSON.stringify({ id: p.id, name: p.name, price: p.price, imageUrl: p.imageUrl })})'>
-            + Adicionar
+          <div class="product-price"><span>$</span>${parseFloat(p.price).toFixed(2).replace('.', ',')}</div>
+          <button class="btn-add"
+            data-id="${p.id}"
+            data-name="${encodeURIComponent(p.name)}"
+            data-price="${p.price}"
+            data-img="${encodeURIComponent(p.imageUrl || '')}">
+            + Agregar
           </button>
         </div>
       </div>
     </div>`).join('');
+}
+
+function buildCategoryBar(products) {
+  const bar = document.querySelector('.categories-bar');
+  if (!bar) return;
+  const cats = ['todos', ...new Set(products.map(p => p.category).filter(Boolean))];
+  bar.innerHTML = cats.map(c =>
+    `<button class="cat-btn${c === 'todos' ? ' active' : ''}" data-cat="${c}">
+      ${c === 'todos' ? 'Todos' : c.charAt(0).toUpperCase() + c.slice(1)}
+    </button>`
+  ).join('');
 }
 
 function filterProducts(category) {
@@ -292,25 +308,11 @@ function filterProducts(category) {
   renderProducts(filtered);
 }
 
-window.filterProducts = filterProducts;
-window.addToCart = addToCart;
-
-function buildCategoryBar(products) {
-  const bar = document.querySelector('.categories-bar');
-  if (!bar) return;
-  const cats = ['todos', ...new Set(products.map(p => p.category).filter(Boolean))];
-  bar.innerHTML = cats.map(c =>
-    `<button class="cat-btn${c === 'todos' ? ' active' : ''}" data-cat="${c}" onclick="filterProducts('${c}')">
-      ${c.charAt(0).toUpperCase() + c.slice(1)}
-    </button>`
-  ).join('');
-}
-
 // ─── STATUS BANNER ──────────────────────────────
 function updateStatusBanner(status, msg) {
   const banner = document.getElementById('status-banner');
   if (!banner) return;
-  banner.textContent = msg || (status === 'aberto' ? '🟢 Estamos ABERTOS — Faça seu pedido agora!' : '🔴 Estamos FECHADOS no momento');
+  banner.textContent = msg || (status === 'aberto' ? '🟢 ¡Estamos ABIERTOS — Hacé tu pedido ahora!' : '🔴 Estamos CERRADOS por el momento');
   banner.className = '';
   banner.classList.add(status);
 }
@@ -401,24 +403,54 @@ function initHamburger() {
 // ─── INIT ────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   // Referências DOM
-  cartDrawer   = document.getElementById('cart-drawer');
-  cartOverlay  = document.getElementById('cart-overlay');
+  cartDrawer    = document.getElementById('cart-drawer');
+  cartOverlay   = document.getElementById('cart-overlay');
   checkoutModal = document.getElementById('checkout-modal');
-  lightbox     = document.getElementById('lightbox');
-  lightboxImg  = document.getElementById('lightbox-img');
+  lightbox      = document.getElementById('lightbox');
+  lightboxImg   = document.getElementById('lightbox-img');
 
-  // Slider buttons
+  // ── EVENT DELEGATION para produtos (resolve bug mobile) ──
+  // Botões "Agregar" — usa data-attributes, sem onclick inline
+  document.getElementById('products-grid')?.addEventListener('click', e => {
+    // Botão adicionar ao carrinho
+    const btnAdd = e.target.closest('.btn-add');
+    if (btnAdd) {
+      e.preventDefault();
+      e.stopPropagation();
+      addToCart({
+        id:       btnAdd.dataset.id,
+        name:     decodeURIComponent(btnAdd.dataset.name),
+        price:    parseFloat(btnAdd.dataset.price),
+        imageUrl: decodeURIComponent(btnAdd.dataset.img)
+      });
+      return;
+    }
+    // Lightbox — clique na imagem ou botão de zoom
+    const imgWrap = e.target.closest('.product-img-wrap');
+    if (imgWrap) {
+      const src = decodeURIComponent(imgWrap.dataset.lightbox || '');
+      if (src) openLightbox(src);
+    }
+  });
+
+  // ── Barra de categorias ──
+  document.querySelector('.categories-bar')?.addEventListener('click', e => {
+    const btn = e.target.closest('.cat-btn');
+    if (btn) filterProducts(btn.dataset.cat);
+  });
+
+  // ── Slider ──
   document.querySelector('.slider-btn.prev')?.addEventListener('click', () => { goToSlide(currentSlide - 1); startAutoSlide(); });
   document.querySelector('.slider-btn.next')?.addEventListener('click', () => { goToSlide(currentSlide + 1); startAutoSlide(); });
 
-  // Cart
+  // ── Cart ──
   document.querySelectorAll('.btn-cart').forEach(btn => btn.addEventListener('click', openCart));
   document.querySelector('.cart-close')?.addEventListener('click', closeCart);
   cartOverlay?.addEventListener('click', closeCart);
 
-  // Checkout
+  // ── Checkout ──
   document.querySelector('.btn-checkout')?.addEventListener('click', () => {
-    if (!cart.length) { showToast('⚠️ Adicione itens ao carrinho!'); return; }
+    if (!cart.length) { showToast('⚠️ ¡Agregá productos al carrito!'); return; }
     closeCart();
     checkoutModal?.classList.add('active');
   });
@@ -426,29 +458,29 @@ document.addEventListener('DOMContentLoaded', () => {
     checkoutModal?.classList.remove('active');
   });
   document.querySelector('.btn-confirm')?.addEventListener('click', () => {
-    const nome   = document.getElementById('cust-name')?.value.trim();
-    const wpp    = document.getElementById('cust-wpp')?.value.trim();
-    const rua    = document.getElementById('cust-rua')?.value.trim();
-    const num    = document.getElementById('cust-num')?.value.trim();
-    const bairro = document.getElementById('cust-bairro')?.value.trim();
+    const nombre  = document.getElementById('cust-name')?.value.trim();
+    const wpp     = document.getElementById('cust-wpp')?.value.trim();
+    const calle   = document.getElementById('cust-rua')?.value.trim();
+    const numero  = document.getElementById('cust-num')?.value.trim();
+    const barrio  = document.getElementById('cust-bairro')?.value.trim();
 
-    if (!nome || !wpp || !rua || !num || !bairro) {
-      showToast('⚠️ Preencha todos os campos!');
+    if (!nombre || !wpp || !calle || !numero || !barrio) {
+      showToast('⚠️ ¡Completá todos los campos!');
       return;
     }
 
     const total = getCartTotal().toFixed(2).replace('.', ',');
     const msg = encodeURIComponent(
-`🇧🇷 *Cocina Brasileña — Novo Pedido*
+`🇧🇷 *Cocina Brasileña — Nuevo Pedido*
 
-👤 *Cliente:* ${nome}
+👤 *Cliente:* ${nombre}
 📱 *WhatsApp:* ${wpp}
-📍 *Endereço:* ${rua}, ${num} — ${bairro}
+📍 *Dirección:* ${calle} ${numero}, ${barrio}
 
-📋 *Itens:*
-${cart.map(i => `• ${i.name} x${i.qty} — R$ ${(i.price * i.qty).toFixed(2).replace('.', ',')}`).join('\n')}
+📋 *Productos:*
+${cart.map(i => `• ${i.name} x${i.qty} — $${(i.price * i.qty).toFixed(2).replace('.', ',')}`).join('\n')}
 
-💰 *Total: R$ ${total}*`
+💰 *Total: $${total}*`
     );
 
     window.open(`https://wa.me/5513981763452?text=${msg}`, '_blank');
@@ -456,14 +488,16 @@ ${cart.map(i => `• ${i.name} x${i.qty} — R$ ${(i.price * i.qty).toFixed(2).r
     saveCart();
     updateCartUI();
     checkoutModal?.classList.remove('active');
-    showToast('✅ Pedido enviado pelo WhatsApp!');
+    showToast('✅ ¡Pedido enviado por WhatsApp!');
   });
 
-  // Lightbox
+  // ── Lightbox ──
   document.querySelector('.lightbox-close')?.addEventListener('click', closeLightbox);
   lightbox?.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+  // Fechar lightbox com ESC
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeLightbox(); closeCart(); } });
 
-  // Init
+  // ── Init ──
   initLoading();
   initHamburger();
   updateCartUI();
