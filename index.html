@@ -184,6 +184,398 @@
 
 <div id="toast-container" class="toast-container"></div>
 
-<script type="module" src="js/main.js?v=1.10"></script>
+<!-- Firebase via CDN global (sem módulos — funciona em qualquer celular) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+<script>
+// ─── FIREBASE CONFIG ────────────────────────────
+firebase.initializeApp({
+  apiKey:            "AIzaSyBfxMRk_UdCBZkg60omMZnh1WZH5FJ04FI",
+  authDomain:        "cocina-brasilena.firebaseapp.com",
+  projectId:         "cocina-brasilena",
+  storageBucket:     "cocina-brasilena.firebasestorage.app",
+  messagingSenderId: "807151796377",
+  appId:             "1:807151796377:web:695aefc66e558952683808"
+});
+var db = firebase.firestore();
+
+// ─── CLOUDINARY ─────────────────────────────────
+var CLOUD_NAME    = "dc0bxgeea";
+var UPLOAD_PRESET = "cocina_upload";
+
+// ─── CARRINHO ────────────────────────────────────
+var cart = [];
+try { cart = JSON.parse(localStorage.getItem('cocina_cart') || '[]'); } catch(e) { cart = []; }
+
+function saveCart() {
+  try { localStorage.setItem('cocina_cart', JSON.stringify(cart)); } catch(e) {}
+}
+function cartTotal() {
+  return cart.reduce(function(s,i){ return s + i.price * i.qty; }, 0);
+}
+function cartCount() {
+  return cart.reduce(function(s,i){ return s + i.qty; }, 0);
+}
+function addToCart(id, name, price, imageUrl) {
+  var ex = null;
+  for (var k=0; k<cart.length; k++) { if (cart[k].id === id) { ex = cart[k]; break; } }
+  if (ex) { ex.qty++; }
+  else { cart.push({ id: id, name: name, price: parseFloat(price), imageUrl: imageUrl, qty: 1 }); }
+  saveCart();
+  refreshCartUI();
+  showToast('🛒 Agregado: ' + name);
+}
+function removeFromCart(id) {
+  cart = cart.filter(function(i){ return i.id !== id; });
+  saveCart();
+  refreshCartUI();
+}
+function changeQty(id, delta) {
+  for (var k=0; k<cart.length; k++) {
+    if (cart[k].id === id) {
+      cart[k].qty += delta;
+      if (cart[k].qty <= 0) { removeFromCart(id); return; }
+      saveCart(); refreshCartUI(); return;
+    }
+  }
+}
+
+function refreshCartUI() {
+  var count = cartCount();
+  var els = document.querySelectorAll('.cart-count');
+  for (var i=0; i<els.length; i++) {
+    els[i].textContent = count;
+    els[i].style.display = count > 0 ? '' : 'none';
+  }
+  renderCartItems();
+}
+
+function renderCartItems() {
+  var container = document.getElementById('cart-items');
+  var totalEl   = document.getElementById('cart-total-value');
+  if (!container) return;
+  if (!cart.length) {
+    container.innerHTML = '<div class="cart-empty"><div class="empty-icon">🍽️</div><p>Tu carrito está vacío</p></div>';
+    if (totalEl) totalEl.textContent = '$ 0,00';
+    return;
+  }
+  var html = '';
+  for (var i=0; i<cart.length; i++) {
+    var item = cart[i];
+    html += '<div class="cart-item">' +
+      '<img class="cart-item-img" src="'+(item.imageUrl||'')+'" alt="'+item.name+'" onerror="this.style.display=\'none\'">' +
+      '<div class="cart-item-info">' +
+        '<div class="cart-item-name">'+item.name+'</div>' +
+        '<div class="cart-item-price">$ '+(item.price*item.qty).toFixed(2).replace('.',',')+'</div>' +
+        '<div class="cart-item-controls">' +
+          '<button class="qty-btn" onclick="changeQty(\''+item.id+'\', -1)">−</button>' +
+          '<span class="qty-val">'+item.qty+'</span>' +
+          '<button class="qty-btn" onclick="changeQty(\''+item.id+'\', +1)">+</button>' +
+        '</div>' +
+      '</div>' +
+      '<button class="cart-item-remove" onclick="removeFromCart(\''+item.id+'\')">🗑️</button>' +
+    '</div>';
+  }
+  container.innerHTML = html;
+  if (totalEl) totalEl.textContent = '$ ' + cartTotal().toFixed(2).replace('.',',');
+}
+
+// ─── CART DRAWER ─────────────────────────────────
+function openCart() {
+  var d = document.getElementById('cart-drawer');
+  var o = document.getElementById('cart-overlay');
+  if (d) d.classList.add('open');
+  if (o) o.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeCart() {
+  var d = document.getElementById('cart-drawer');
+  var o = document.getElementById('cart-overlay');
+  if (d) d.classList.remove('open');
+  if (o) o.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// ─── LIGHTBOX ────────────────────────────────────
+function openLightbox(src) {
+  var lb = document.getElementById('lightbox');
+  var img = document.getElementById('lightbox-img');
+  if (lb && img) { img.src = src; lb.classList.add('active'); }
+}
+function closeLightbox() {
+  var lb = document.getElementById('lightbox');
+  if (lb) lb.classList.remove('active');
+}
+
+// ─── TOAST ───────────────────────────────────────
+function showToast(msg) {
+  var c = document.getElementById('toast-container');
+  if (!c) return;
+  var t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 3200);
+}
+
+// ─── PRODUTOS ────────────────────────────────────
+var allProducts = [];
+var activeCategory = 'todos';
+
+function renderProducts(list) {
+  var grid = document.getElementById('products-grid');
+  if (!grid) return;
+  if (!list.length) {
+    grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:48px;color:#888">No hay productos disponibles.</p>';
+    return;
+  }
+  var html = '';
+  for (var i=0; i<list.length; i++) {
+    var p = list[i];
+    var id    = (p.id||'').replace(/'/g,"\\'");
+    var name  = (p.name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    var price = parseFloat(p.price)||0;
+    var img   = (p.imageUrl||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    var desc  = p.description||'';
+    var badge = p.badge||'';
+    html +=
+      '<div class="product-card">' +
+        '<div class="product-img-wrap" onclick="openLightbox(\''+(p.imageUrl||'')+'\')">'+
+          '<img src="'+(p.imageUrl||'')+'" alt="'+name+'" loading="lazy" onerror="this.src=\'https://via.placeholder.com/400x300\'">'+
+          (badge?'<span class="product-badge">'+badge+'</span>':'')+
+        '</div>'+
+        '<div class="product-info">'+
+          '<div class="product-name">'+name+'</div>'+
+          '<div class="product-desc">'+desc+'</div>'+
+          '<div class="product-footer">'+
+            '<div class="product-price"><span>$ </span>'+price.toFixed(2).replace('.',',')+'</div>'+
+            '<button class="btn-add" onclick="addToCart(\''+id+'\',\''+name+'\','+price+',\''+img+'\')">+ Agregar</button>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function buildCategoryBar(products) {
+  var bar = document.querySelector('.categories-bar');
+  if (!bar) return;
+  var cats = ['todos'];
+  for (var i=0; i<products.length; i++) {
+    if (products[i].category && cats.indexOf(products[i].category) === -1)
+      cats.push(products[i].category);
+  }
+  var html = '';
+  for (var j=0; j<cats.length; j++) {
+    var c = cats[j];
+    html += '<button class="cat-btn'+(c==='todos'?' active':'')+'" onclick="filterProducts(\''+c+'\')">'+(c==='todos'?'Todos':c.charAt(0).toUpperCase()+c.slice(1))+'</button>';
+  }
+  bar.innerHTML = html;
+}
+
+function filterProducts(category) {
+  activeCategory = category;
+  var btns = document.querySelectorAll('.cat-btn');
+  for (var i=0; i<btns.length; i++) {
+    btns[i].classList.toggle('active', btns[i].getAttribute('onclick') && btns[i].getAttribute('onclick').indexOf("'"+category+"'") !== -1);
+  }
+  var list = category === 'todos' ? allProducts : allProducts.filter(function(p){ return p.category === category; });
+  renderProducts(list);
+}
+
+// ─── SLIDER ─────────────────────────────────────
+var currentSlide = 0;
+var slides = [];
+var autoSlide;
+
+function initSlider(data) {
+  var track    = document.querySelector('.slides-track');
+  var dotsWrap = document.querySelector('.slider-dots');
+  if (!track || !dotsWrap) return;
+  slides = data.length ? data : [{ imageUrl:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200' }];
+  track.innerHTML = '';
+  dotsWrap.innerHTML = '';
+  for (var i=0; i<slides.length; i++) {
+    var div = document.createElement('div');
+    div.className = 'slide';
+    div.innerHTML = '<img src="'+slides[i].imageUrl+'" alt="" loading="lazy">';
+    track.appendChild(div);
+    var dot = document.createElement('div');
+    dot.className = 'dot' + (i===0?' active':'');
+    (function(idx){ dot.onclick = function(){ goToSlide(idx); resetAuto(); }; })(i);
+    dotsWrap.appendChild(dot);
+  }
+  goToSlide(0);
+  resetAuto();
+}
+function goToSlide(n) {
+  currentSlide = ((n % slides.length) + slides.length) % slides.length;
+  var track = document.querySelector('.slides-track');
+  if (track) track.style.transform = 'translateX(-'+(currentSlide*100)+'%)';
+  var dots = document.querySelectorAll('.dot');
+  for (var i=0; i<dots.length; i++) dots[i].classList.toggle('active', i===currentSlide);
+}
+function resetAuto() {
+  clearInterval(autoSlide);
+  autoSlide = setInterval(function(){ goToSlide(currentSlide+1); }, 5000);
+}
+
+// ─── STATUS ──────────────────────────────────────
+function updateStatusBanner(status, msg) {
+  var banner = document.getElementById('status-banner');
+  if (!banner) return;
+  banner.textContent = msg || (status==='aberto'
+    ? '🟢 ¡Estamos ABIERTOS — Hacé tu pedido ahora!'
+    : '🔴 Estamos CERRADOS por el momento');
+  banner.className = status;
+}
+
+// ─── LOADING ─────────────────────────────────────
+function initLoading() {
+  var screen = document.getElementById('loading-screen');
+  var bar    = document.querySelector('.loading-bar');
+  if (!screen) return;
+  var pct = 0;
+  var steps = [15,20,15,20,15,15];
+  var si = 0;
+  function tick() {
+    if (si >= steps.length) {
+      if (bar) bar.style.width = '100%';
+      setTimeout(function(){
+        screen.classList.add('hidden');
+        setTimeout(function(){
+          screen.style.display = 'none';
+          screen.style.pointerEvents = 'none';
+          screen.style.visibility = 'hidden';
+        }, 900);
+      }, 300);
+      return;
+    }
+    pct += steps[si++];
+    if (bar) bar.style.width = Math.min(pct,100)+'%';
+    setTimeout(tick, 300+Math.random()*200);
+  }
+  setTimeout(tick, 400);
+  setTimeout(function(){
+    screen.style.display = 'none';
+    screen.style.pointerEvents = 'none';
+    screen.style.visibility = 'hidden';
+  }, 6000);
+}
+
+// ─── HAMBURGER ───────────────────────────────────
+function initHamburger() {
+  var btn     = document.getElementById('btn-hamburger');
+  var nav     = document.getElementById('main-nav');
+  var overlay = document.getElementById('nav-overlay');
+  if (!btn || !nav) return;
+  function openNav() {
+    nav.classList.add('open'); btn.classList.add('active');
+    if (overlay) overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeNav() {
+    nav.classList.remove('open'); btn.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  btn.onclick = function(){ nav.classList.contains('open') ? closeNav() : openNav(); };
+  if (overlay) overlay.onclick = closeNav;
+  var links = nav.querySelectorAll('a');
+  for (var i=0; i<links.length; i++) links[i].onclick = closeNav;
+  window.onresize = function(){ if (window.innerWidth > 768) closeNav(); };
+}
+
+// ─── FIREBASE LISTENERS ──────────────────────────
+function loadFromFirebase() {
+  db.collection('products').onSnapshot(function(snap) {
+    allProducts = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
+      .filter(function(p){ return p.active !== false; });
+    buildCategoryBar(allProducts);
+    filterProducts(activeCategory);
+  });
+
+  db.collection('slides').onSnapshot(function(snap) {
+    var data = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
+      .sort(function(a,b){ return (a.order||0)-(b.order||0); });
+    initSlider(data);
+  });
+
+  db.doc('config/status').onSnapshot(function(snap) {
+    if (snap.exists) updateStatusBanner(snap.data().status, snap.data().message);
+  });
+
+  db.doc('config/logo').onSnapshot(function(snap) {
+    if (snap.exists && snap.data().url) {
+      var imgs = document.querySelectorAll('.logo-img');
+      for (var i=0; i<imgs.length; i++) {
+        imgs[i].src = snap.data().url;
+        imgs[i].style.display = 'block';
+      }
+    }
+  });
+}
+
+// ─── INIT ────────────────────────────────────────
+window.onload = function() {
+  initLoading();
+  initHamburger();
+  refreshCartUI();
+
+  // Carrinho
+  var btnsCart = document.querySelectorAll('.btn-cart');
+  for (var i=0; i<btnsCart.length; i++) btnsCart[i].onclick = openCart;
+  var cartClose = document.querySelector('.cart-close');
+  if (cartClose) cartClose.onclick = closeCart;
+  var cartOverlay = document.getElementById('cart-overlay');
+  if (cartOverlay) cartOverlay.onclick = closeCart;
+
+  // Checkout
+  var btnCheckout = document.querySelector('.btn-checkout');
+  if (btnCheckout) btnCheckout.onclick = function() {
+    if (!cart.length) { showToast('⚠️ ¡Agregá productos al carrito!'); return; }
+    closeCart();
+    var m = document.getElementById('checkout-modal');
+    if (m) m.classList.add('active');
+  };
+  var btnCancel = document.querySelector('.btn-cancel');
+  if (btnCancel) btnCancel.onclick = function() {
+    var m = document.getElementById('checkout-modal');
+    if (m) m.classList.remove('active');
+  };
+  var btnConfirm = document.querySelector('.btn-confirm');
+  if (btnConfirm) btnConfirm.onclick = function() {
+    var nombre = document.getElementById('cust-name').value.trim();
+    var wpp    = document.getElementById('cust-wpp').value.trim();
+    var calle  = document.getElementById('cust-rua').value.trim();
+    var numero = document.getElementById('cust-num').value.trim();
+    var barrio = document.getElementById('cust-bairro').value.trim();
+    if (!nombre||!wpp||!calle||!numero||!barrio) { showToast('⚠️ ¡Completá todos los campos!'); return; }
+    var total = cartTotal().toFixed(2).replace('.',',');
+    var items = cart.map(function(i){ return '• '+i.name+' x'+i.qty+' — $'+(i.price*i.qty).toFixed(2).replace('.',','); }).join('\n');
+    var msg = encodeURIComponent('🇧🇷 *Cocina Brasileña — Nuevo Pedido*\n\n👤 *Cliente:* '+nombre+'\n📱 *WhatsApp:* '+wpp+'\n📍 *Dirección:* '+calle+' '+numero+', '+barrio+'\n\n📋 *Productos:*\n'+items+'\n\n💰 *Total: $'+total+'*');
+    window.open('https://wa.me/5513981763452?text='+msg, '_blank');
+    cart=[]; saveCart(); refreshCartUI();
+    document.getElementById('checkout-modal').classList.remove('active');
+    showToast('✅ ¡Pedido enviado por WhatsApp!');
+  };
+
+  // Slider
+  var prev = document.querySelector('.slider-btn.prev');
+  var next = document.querySelector('.slider-btn.next');
+  if (prev) prev.onclick = function(){ goToSlide(currentSlide-1); resetAuto(); };
+  if (next) next.onclick = function(){ goToSlide(currentSlide+1); resetAuto(); };
+
+  // Lightbox
+  var lbClose = document.querySelector('.lightbox-close');
+  var lb = document.getElementById('lightbox');
+  if (lbClose) lbClose.onclick = closeLightbox;
+  if (lb) lb.onclick = function(e){ if(e.target===lb) closeLightbox(); };
+
+  loadFromFirebase();
+};
+</script>
 </body>
 </html>
