@@ -5,576 +5,474 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cocina Brasileña — Comida por Pedido</title>
   <meta name="description" content="Los mejores sabores de Brasil, frescos y entregados para vos.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇧🇷</text></svg>">
-  <link rel="stylesheet" href="css/style.css?v=1.10">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════
-     LOADING SCREEN
-══════════════════════════════════════════════ -->
-<div id="loading-screen">
-
-  <!-- Partículas flutuantes -->
-  <div class="loading-particles" id="loading-particles"></div>
-
-  <!-- Logo animado -->
-  <div class="loading-logo-wrap">
-    <img src="img/logo.png" alt="Cocina Brasileña" class="loading-logo-img" id="loading-logo">
-    <div class="loading-logo-glow"></div>
-  </div>
-
-  <!-- Barra de progresso -->
-  <div class="loading-bar-wrap">
-    <div class="loading-bar"></div>
-  </div>
-  <div class="loading-dots">Carregando</div>
+<!-- LOADING -->
+<div id="loading">
+  <img src="img/logo.png" alt="Cocina Brasileña">
+  <div class="load-bar-bg"><div class="load-bar" id="load-bar"></div></div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     STATUS BANNER
-══════════════════════════════════════════════ -->
+<!-- STATUS -->
 <div id="status-banner"></div>
 
-<!-- ═══════════════════════════════════════════
-     HEADER
-══════════════════════════════════════════════ -->
+<!-- HEADER -->
 <header class="site-header">
   <div class="header-top">
     <div class="logo-wrap">
-      <img class="logo-img" src="" alt="Logo" style="display:none" onerror="this.style.display='none'">
-      <div class="logo-name">
-        Cocina Brasileña
-        <small>Comida por Pedido</small>
-      </div>
+      <img id="logo-img" src="" alt="Logo">
+      <div class="logo-name">Cocina Brasileña<small>Comida por Pedido</small></div>
     </div>
-
-    <div class="header-actions">
-      <button class="btn-cart" title="Carrito">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        <span class="btn-cart-label">Carrito</span>
-        <span class="cart-count">0</span>
+    <div class="header-right">
+      <button class="btn-cart" id="btn-cart">
+        🛒 Carrito
+        <span class="cart-badge" id="cart-badge">0</span>
       </button>
-      <button class="btn-hamburger" id="btn-hamburger" aria-label="Menú" aria-expanded="false">
+      <button class="btn-ham" id="btn-ham" aria-label="Menú">
         <span></span><span></span><span></span>
       </button>
     </div>
   </div>
-
   <nav class="main-nav" id="main-nav">
     <ul>
       <li><a href="#inicio" class="active">Inicio</a></li>
-      <li><a href="#cardapio">Menú</a></li>
-      <li><a href="#sobre">Nosotros</a></li>
+      <li><a href="#menu">Menú</a></li>
+      <li><a href="#nosotros">Nosotros</a></li>
     </ul>
   </nav>
-  <!-- Overlay mobile para fechar o menu -->
   <div class="nav-overlay" id="nav-overlay"></div>
 </header>
 
-<!-- ═══════════════════════════════════════════
-     HERO SLIDER
-══════════════════════════════════════════════ -->
-<section id="inicio" class="hero-slider">
-  <div class="slides-track"></div>
-  <button class="slider-btn prev">&#8249;</button>
-  <button class="slider-btn next">&#8250;</button>
-  <div class="slider-dots"></div>
+<!-- SLIDER -->
+<section id="inicio" class="hero">
+  <div class="slides-track" id="slides-track"></div>
+  <button class="slide-btn prev" id="btn-prev">&#8249;</button>
+  <button class="slide-btn next" id="btn-next">&#8250;</button>
+  <div class="slide-dots" id="slide-dots"></div>
 </section>
 
-<!-- ═══════════════════════════════════════════
-     PRODUCTS
-══════════════════════════════════════════════ -->
-<section id="cardapio" class="products-section">
-  <div class="section-title">
+<!-- MENU -->
+<section id="menu" class="products-sec">
+  <div class="sec-title">
     <h2>Nuestro Menú</h2>
     <p>Hecho con amor, sabor y mucho condimento brasileño 🌶️</p>
   </div>
-
-  <div class="categories-bar">
-    <button class="cat-btn active" data-cat="todos">Todos</button>
-  </div>
-
-  <div id="products-grid" class="products-grid">
-    <div style="grid-column:1/-1;text-align:center;padding:60px;color:#888">
-      <div style="font-size:2.5rem;margin-bottom:12px">🍽️</div>
-      <p>Cargando el menú...</p>
-    </div>
+  <div class="cat-bar" id="cat-bar"></div>
+  <div class="products-grid" id="products-grid">
+    <p style="grid-column:1/-1;text-align:center;padding:48px;color:#888">Cargando menú...</p>
   </div>
 </section>
 
-<section id="sobre" style="background:var(--azul);color:#fff;padding:60px 5%;text-align:center">
-  <h2 style="font-family:var(--font-display);font-size:2rem;margin-bottom:16px;color:var(--amarelo)">Nuestra Historia</h2>
-  <p style="max-width:600px;margin:0 auto;opacity:0.85;line-height:1.7">
-    Cocina Brasileña nació de la pasión por los sabores auténticos de Brasil.
-    Cada plato es preparado con ingredientes frescos y mucho cariño,
-    trayendo lo mejor de la gastronomía brasileña directamente a tu mesa.
-    🇧🇷❤️
-  </p>
+<!-- NOSOTROS -->
+<section id="nosotros" class="sobre">
+  <h2>Nuestra Historia</h2>
+  <p>Cocina Brasileña nació de la pasión por los sabores auténticos de Brasil. Cada plato es preparado con ingredientes frescos y mucho cariño, trayendo lo mejor de la gastronomía brasileña directamente a tu mesa. 🇧🇷❤️</p>
 </section>
 
+<!-- FOOTER -->
 <footer>
   <div class="footer-logo">Cocina Brasileña</div>
   <p>Comida por Pedido · Hecho con 💚💛 de Brasil</p>
-  <p style="margin-top:8px;font-size:0.78rem;opacity:0.5">© 2025 Cocina Brasileña. Todos los derechos reservados.</p>
-  <a href="admin/index.html" class="footer-admin-link" title="Área administrativa">⚙️ Admin</a>
+  <p style="margin-top:6px;font-size:.75rem;opacity:.4">© 2025 Cocina Brasileña. Todos los derechos reservados.</p>
+  <a href="admin/" class="admin-link">⚙️ Admin</a>
 </footer>
 
-<div id="cart-overlay" class="cart-overlay"></div>
-
+<!-- CART -->
+<div id="cart-overlay"></div>
 <aside id="cart-drawer">
-  <div class="cart-header">
+  <div class="cart-hd">
     <h3>🛒 Mi Carrito</h3>
-    <button class="cart-close">✕</button>
+    <button class="cart-x" id="cart-close">✕</button>
   </div>
-  <div id="cart-items" class="cart-items"></div>
-  <div class="cart-footer">
+  <div class="cart-body" id="cart-body"></div>
+  <div class="cart-ft">
     <div class="cart-total">
       <span>Total del pedido</span>
-      <span id="cart-total-value" class="cart-total-value">$ 0,00</span>
+      <span class="cart-total-val" id="cart-total">$ 0,00</span>
     </div>
-    <button class="btn-checkout">
-      📲 Finalizar Pedido por WhatsApp
-    </button>
+    <button class="btn-checkout" id="btn-checkout">📲 Finalizar por WhatsApp</button>
   </div>
 </aside>
 
+<!-- CHECKOUT -->
 <div id="checkout-modal">
   <div class="modal-box">
-    <div class="modal-header">
+    <div class="modal-hd">
       <h3>📋 Datos de Entrega</h3>
       <p>Completá tus datos para finalizar el pedido</p>
     </div>
     <div class="modal-body">
-      <div class="form-group">
-        <label>👤 Tu Nombre</label>
-        <input id="cust-name" type="text" placeholder="Nombre completo" required>
-      </div>
-      <div class="form-group">
-        <label>📱 WhatsApp</label>
-        <input id="cust-wpp" type="tel" placeholder="(11) 1234-5678" required>
-      </div>
-      <div class="form-group">
-        <label>📍 Dirección de Entrega</label>
-        <div class="address-row">
-          <input id="cust-rua" type="text" placeholder="Nombre de la calle / avenida" required>
-          <input id="cust-num" type="text" placeholder="Número" required>
+      <div class="fg"><label>👤 Tu Nombre</label><input id="f-nombre" type="text" placeholder="Nombre completo"></div>
+      <div class="fg"><label>📱 WhatsApp</label><input id="f-wpp" type="tel" placeholder="(11) 1234-5678"></div>
+      <div class="fg">
+        <label>📍 Dirección</label>
+        <div class="addr-row">
+          <input id="f-calle" type="text" placeholder="Calle / Avenida">
+          <input id="f-num" type="text" placeholder="Número">
         </div>
-        <div style="margin-top:10px">
-          <input id="cust-bairro" type="text" placeholder="Barrio" required>
+        <div style="margin-top:8px">
+          <input id="f-barrio" type="text" placeholder="Barrio">
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-cancel">Volver</button>
-      <button class="btn-confirm">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 0C5.373 0 0 5.373 0 12c0 2.117.554 4.1 1.523 5.82L0 24l6.335-1.51A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.806 9.806 0 01-4.994-1.366l-.358-.214-3.762.898.936-3.673-.234-.376A9.808 9.808 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.429 0 9.818 4.388 9.818 9.818 0 5.43-4.39 9.818-9.819 9.818z"/></svg>
+    <div class="modal-ft">
+      <button class="btn-back" id="btn-back">Volver</button>
+      <button class="btn-send" id="btn-send">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 0C5.373 0 0 5.373 0 12c0 2.117.554 4.1 1.523 5.82L0 24l6.335-1.51A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.806 9.806 0 01-4.994-1.366l-.358-.214-3.762.898.936-3.673-.234-.376A9.808 9.808 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.429 0 9.818 4.388 9.818 9.818 0 5.43-4.39 9.818-9.819 9.818z"/></svg>
         Enviar por WhatsApp
       </button>
     </div>
   </div>
 </div>
 
+<!-- LIGHTBOX -->
 <div id="lightbox">
-  <div class="lightbox-inner">
-    <img id="lightbox-img" src="" alt="Imagen ampliada">
-    <button class="lightbox-close">✕</button>
+  <div class="lb-inner">
+    <img id="lb-img" src="" alt="">
+    <button class="lb-close" id="lb-close">✕</button>
   </div>
 </div>
 
-<div id="toast-container" class="toast-container"></div>
+<!-- TOASTS -->
+<div id="toasts"></div>
 
-<!-- Firebase via CDN global (sem módulos — funciona em qualquer celular) -->
+<!-- ══════════════════════════════════════
+     FIREBASE + LÓGICA (sin módulos)
+══════════════════════════════════════ -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-
 <script>
-// ─── FIREBASE CONFIG ────────────────────────────
+
+// ─── FIREBASE ───────────────────────────────────
 firebase.initializeApp({
-  apiKey:            "AIzaSyBfxMRk_UdCBZkg60omMZnh1WZH5FJ04FI",
-  authDomain:        "cocina-brasilena.firebaseapp.com",
-  projectId:         "cocina-brasilena",
-  storageBucket:     "cocina-brasilena.firebasestorage.app",
-  messagingSenderId: "807151796377",
-  appId:             "1:807151796377:web:695aefc66e558952683808"
+  apiKey:"AIzaSyBfxMRk_UdCBZkg60omMZnh1WZH5FJ04FI",
+  authDomain:"cocina-brasilena.firebaseapp.com",
+  projectId:"cocina-brasilena",
+  storageBucket:"cocina-brasilena.firebasestorage.app",
+  messagingSenderId:"807151796377",
+  appId:"1:807151796377:web:695aefc66e558952683808"
 });
 var db = firebase.firestore();
 
-// ─── CLOUDINARY ─────────────────────────────────
-var CLOUD_NAME    = "dc0bxgeea";
-var UPLOAD_PRESET = "cocina_upload";
-
-// ─── CARRINHO ────────────────────────────────────
+// ─── CART ───────────────────────────────────────
 var cart = [];
-try { cart = JSON.parse(localStorage.getItem('cocina_cart') || '[]'); } catch(e) { cart = []; }
+try{ cart = JSON.parse(localStorage.getItem('cart')||'[]'); }catch(e){}
 
-function saveCart() {
-  try { localStorage.setItem('cocina_cart', JSON.stringify(cart)); } catch(e) {}
+function saveCart(){ try{ localStorage.setItem('cart',JSON.stringify(cart)); }catch(e){} }
+
+function cartTotal(){
+  var t=0; for(var i=0;i<cart.length;i++) t+=cart[i].price*cart[i].qty; return t;
 }
-function cartTotal() {
-  return cart.reduce(function(s,i){ return s + i.price * i.qty; }, 0);
+function cartCount(){
+  var c=0; for(var i=0;i<cart.length;i++) c+=cart[i].qty; return c;
 }
-function cartCount() {
-  return cart.reduce(function(s,i){ return s + i.qty; }, 0);
+
+function addToCart(id,name,price,img){
+  var found=false;
+  for(var i=0;i<cart.length;i++){
+    if(cart[i].id===id){ cart[i].qty++; found=true; break; }
+  }
+  if(!found) cart.push({id:id,name:name,price:price,imageUrl:img,qty:1});
+  saveCart(); updateCartUI();
+  toast('🛒 ¡'+name+' agregado!');
 }
-function addToCart(id, name, price, imageUrl) {
-  var ex = null;
-  for (var k=0; k<cart.length; k++) { if (cart[k].id === id) { ex = cart[k]; break; } }
-  if (ex) { ex.qty++; }
-  else { cart.push({ id: id, name: name, price: parseFloat(price), imageUrl: imageUrl, qty: 1 }); }
-  saveCart();
-  refreshCartUI();
-  showToast('🛒 Agregado: ' + name);
+
+function removeItem(id){
+  var next=[];
+  for(var i=0;i<cart.length;i++) if(cart[i].id!==id) next.push(cart[i]);
+  cart=next; saveCart(); updateCartUI();
 }
-function removeFromCart(id) {
-  cart = cart.filter(function(i){ return i.id !== id; });
-  saveCart();
-  refreshCartUI();
-}
-function changeQty(id, delta) {
-  for (var k=0; k<cart.length; k++) {
-    if (cart[k].id === id) {
-      cart[k].qty += delta;
-      if (cart[k].qty <= 0) { removeFromCart(id); return; }
-      saveCart(); refreshCartUI(); return;
+
+function changeQty(id,d){
+  for(var i=0;i<cart.length;i++){
+    if(cart[i].id===id){
+      cart[i].qty+=d;
+      if(cart[i].qty<=0){ removeItem(id); return; }
+      saveCart(); updateCartUI(); return;
     }
   }
 }
 
-function refreshCartUI() {
-  var count = cartCount();
-  var els = document.querySelectorAll('.cart-count');
-  for (var i=0; i<els.length; i++) {
-    els[i].textContent = count;
-    els[i].style.display = count > 0 ? '' : 'none';
-  }
-  renderCartItems();
-}
+function updateCartUI(){
+  var count=cartCount();
+  var badge=document.getElementById('cart-badge');
+  if(badge){ badge.textContent=count; badge.className='cart-badge'+(count>0?' show':''); }
 
-function renderCartItems() {
-  var container = document.getElementById('cart-items');
-  var totalEl   = document.getElementById('cart-total-value');
-  if (!container) return;
-  if (!cart.length) {
-    container.innerHTML = '<div class="cart-empty"><div class="empty-icon">🍽️</div><p>Tu carrito está vacío</p></div>';
-    if (totalEl) totalEl.textContent = '$ 0,00';
+  var body=document.getElementById('cart-body');
+  var totalEl=document.getElementById('cart-total');
+  if(!body) return;
+
+  if(!cart.length){
+    body.innerHTML='<div class="cart-empty"><div class="ei">🍽️</div><p>Tu carrito está vacío</p></div>';
+    if(totalEl) totalEl.textContent='$ 0,00';
     return;
   }
-  var html = '';
-  for (var i=0; i<cart.length; i++) {
-    var item = cart[i];
-    html += '<div class="cart-item">' +
-      '<img class="cart-item-img" src="'+(item.imageUrl||'')+'" alt="'+item.name+'" onerror="this.style.display=\'none\'">' +
-      '<div class="cart-item-info">' +
-        '<div class="cart-item-name">'+item.name+'</div>' +
-        '<div class="cart-item-price">$ '+(item.price*item.qty).toFixed(2).replace('.',',')+'</div>' +
-        '<div class="cart-item-controls">' +
-          '<button class="qty-btn" onclick="changeQty(\''+item.id+'\', -1)">−</button>' +
-          '<span class="qty-val">'+item.qty+'</span>' +
-          '<button class="qty-btn" onclick="changeQty(\''+item.id+'\', +1)">+</button>' +
-        '</div>' +
-      '</div>' +
-      '<button class="cart-item-remove" onclick="removeFromCart(\''+item.id+'\')">🗑️</button>' +
+
+  var html='';
+  for(var i=0;i<cart.length;i++){
+    var it=cart[i];
+    var sid=it.id.replace(/'/g,"\\'");
+    html+='<div class="cart-item">'+
+      '<img src="'+(it.imageUrl||'')+'" alt="'+it.name+'" onerror="this.style.display=\'none\'">'+
+      '<div class="ci-info">'+
+        '<div class="ci-name">'+it.name+'</div>'+
+        '<div class="ci-price">$ '+(it.price*it.qty).toFixed(2).replace('.',',')+'</div>'+
+        '<div class="ci-ctrl">'+
+          '<button class="qty-btn" onclick="changeQty(\''+sid+'\',-1)">−</button>'+
+          '<span class="qty-val">'+it.qty+'</span>'+
+          '<button class="qty-btn" onclick="changeQty(\''+sid+'\',+1)">+</button>'+
+        '</div>'+
+      '</div>'+
+      '<button class="ci-del" onclick="removeItem(\''+sid+'\')">🗑️</button>'+
     '</div>';
   }
-  container.innerHTML = html;
-  if (totalEl) totalEl.textContent = '$ ' + cartTotal().toFixed(2).replace('.',',');
+  body.innerHTML=html;
+  if(totalEl) totalEl.textContent='$ '+cartTotal().toFixed(2).replace('.',',');
 }
 
-// ─── CART DRAWER ─────────────────────────────────
-function openCart() {
-  var d = document.getElementById('cart-drawer');
-  var o = document.getElementById('cart-overlay');
-  if (d) d.classList.add('open');
-  if (o) o.classList.add('active');
-  document.body.style.overflow = 'hidden';
+// ─── CART DRAWER ────────────────────────────────
+function openCart(){
+  document.getElementById('cart-drawer').classList.add('show');
+  document.getElementById('cart-overlay').classList.add('show');
+  document.body.style.overflow='hidden';
 }
-function closeCart() {
-  var d = document.getElementById('cart-drawer');
-  var o = document.getElementById('cart-overlay');
-  if (d) d.classList.remove('open');
-  if (o) o.classList.remove('active');
-  document.body.style.overflow = '';
+function closeCart(){
+  document.getElementById('cart-drawer').classList.remove('show');
+  document.getElementById('cart-overlay').classList.remove('show');
+  document.body.style.overflow='';
 }
 
-// ─── LIGHTBOX ────────────────────────────────────
-function openLightbox(src) {
-  var lb = document.getElementById('lightbox');
-  var img = document.getElementById('lightbox-img');
-  if (lb && img) { img.src = src; lb.classList.add('active'); }
+// ─── LIGHTBOX ───────────────────────────────────
+function openLightbox(src){
+  document.getElementById('lb-img').src=src;
+  document.getElementById('lightbox').classList.add('show');
 }
-function closeLightbox() {
-  var lb = document.getElementById('lightbox');
-  if (lb) lb.classList.remove('active');
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('show');
 }
 
-// ─── TOAST ───────────────────────────────────────
-function showToast(msg) {
-  var c = document.getElementById('toast-container');
-  if (!c) return;
-  var t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
-  c.appendChild(t);
-  setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 3200);
+// ─── TOAST ──────────────────────────────────────
+function toast(msg){
+  var c=document.getElementById('toasts');
+  var t=document.createElement('div');
+  t.className='toast'; t.textContent=msg; c.appendChild(t);
+  setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },3200);
 }
 
-// ─── PRODUTOS ────────────────────────────────────
-var allProducts = [];
-var activeCategory = 'todos';
+// ─── PRODUCTS ───────────────────────────────────
+var allProducts=[];
+var activeCat='todos';
 
-function renderProducts(list) {
-  var grid = document.getElementById('products-grid');
-  if (!grid) return;
-  if (!list.length) {
-    grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:48px;color:#888">No hay productos disponibles.</p>';
+function renderProducts(list){
+  var g=document.getElementById('products-grid');
+  if(!g) return;
+  if(!list.length){
+    g.innerHTML='<p style="grid-column:1/-1;text-align:center;padding:48px;color:#888">No hay productos disponibles.</p>';
     return;
   }
-  var html = '';
-  for (var i=0; i<list.length; i++) {
-    var p = list[i];
-    var id    = (p.id||'').replace(/'/g,"\\'");
-    var name  = (p.name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
-    var price = parseFloat(p.price)||0;
-    var img   = (p.imageUrl||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
-    var desc  = p.description||'';
-    var badge = p.badge||'';
-    html +=
-      '<div class="product-card">' +
-        '<div class="product-img-wrap" onclick="openLightbox(\''+(p.imageUrl||'')+'\')">'+
-          '<img src="'+(p.imageUrl||'')+'" alt="'+name+'" loading="lazy" onerror="this.src=\'https://via.placeholder.com/400x300\'">'+
-          (badge?'<span class="product-badge">'+badge+'</span>':'')+
+  var html='';
+  for(var i=0;i<list.length;i++){
+    var p=list[i];
+    var price=parseFloat(p.price)||0;
+    // Escapa comillas simples para el onclick
+    var eid=(p.id||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var ename=(p.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var eimg=(p.imageUrl||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    html+=
+      '<div class="product-card">'+
+        '<div class="prod-img" onclick="openLightbox(\''+eimg+'\')">'+
+          '<img src="'+(p.imageUrl||'')+'" alt="'+(p.name||'')+'" loading="lazy" onerror="this.src=\'https://placehold.co/400x300/eee/999?text=Foto\'">'+
+          (p.badge?'<span class="prod-badge">'+p.badge+'</span>':'')+
         '</div>'+
-        '<div class="product-info">'+
-          '<div class="product-name">'+name+'</div>'+
-          '<div class="product-desc">'+desc+'</div>'+
-          '<div class="product-footer">'+
-            '<div class="product-price"><span>$ </span>'+price.toFixed(2).replace('.',',')+'</div>'+
-            '<button class="btn-add" onclick="addToCart(\''+id+'\',\''+name+'\','+price+',\''+img+'\')">+ Agregar</button>'+
+        '<div class="prod-info">'+
+          '<div class="prod-name">'+(p.name||'')+'</div>'+
+          '<div class="prod-desc">'+(p.description||'')+'</div>'+
+          '<div class="prod-footer">'+
+            '<div class="prod-price"><span>$ </span>'+price.toFixed(2).replace('.',',')+'</div>'+
+            '<button class="btn-add" onclick="addToCart(\''+eid+'\',\''+ename+'\','+price+',\''+eimg+'\')">+ Agregar</button>'+
           '</div>'+
         '</div>'+
       '</div>';
   }
-  grid.innerHTML = html;
+  g.innerHTML=html;
 }
 
-function buildCategoryBar(products) {
-  var bar = document.querySelector('.categories-bar');
-  if (!bar) return;
-  var cats = ['todos'];
-  for (var i=0; i<products.length; i++) {
-    if (products[i].category && cats.indexOf(products[i].category) === -1)
+function buildCats(products){
+  var bar=document.getElementById('cat-bar');
+  if(!bar) return;
+  var cats=['todos'];
+  for(var i=0;i<products.length;i++){
+    if(products[i].category && cats.indexOf(products[i].category)===-1)
       cats.push(products[i].category);
   }
-  var html = '';
-  for (var j=0; j<cats.length; j++) {
-    var c = cats[j];
-    html += '<button class="cat-btn'+(c==='todos'?' active':'')+'" onclick="filterProducts(\''+c+'\')">'+(c==='todos'?'Todos':c.charAt(0).toUpperCase()+c.slice(1))+'</button>';
+  var html='';
+  for(var j=0;j<cats.length;j++){
+    var c=cats[j];
+    var label=c==='todos'?'Todos':c.charAt(0).toUpperCase()+c.slice(1);
+    html+='<button class="cat-btn'+(c===activeCat?' active':'')+'" onclick="filterCat(\''+c+'\')">'+label+'</button>';
   }
-  bar.innerHTML = html;
+  bar.innerHTML=html;
 }
 
-function filterProducts(category) {
-  activeCategory = category;
-  var btns = document.querySelectorAll('.cat-btn');
-  for (var i=0; i<btns.length; i++) {
-    btns[i].classList.toggle('active', btns[i].getAttribute('onclick') && btns[i].getAttribute('onclick').indexOf("'"+category+"'") !== -1);
-  }
-  var list = category === 'todos' ? allProducts : allProducts.filter(function(p){ return p.category === category; });
+function filterCat(cat){
+  activeCat=cat;
+  var btns=document.querySelectorAll('.cat-btn');
+  for(var i=0;i<btns.length;i++) btns[i].classList.toggle('active',btns[i].textContent.trim()===(cat==='todos'?'Todos':cat.charAt(0).toUpperCase()+cat.slice(1)));
+  var list=cat==='todos'?allProducts:allProducts.filter(function(p){ return p.category===cat; });
   renderProducts(list);
 }
 
 // ─── SLIDER ─────────────────────────────────────
-var currentSlide = 0;
-var slides = [];
-var autoSlide;
+var slides=[]; var curSlide=0; var sliderTimer;
 
-function initSlider(data) {
-  var track    = document.querySelector('.slides-track');
-  var dotsWrap = document.querySelector('.slider-dots');
-  if (!track || !dotsWrap) return;
-  slides = data.length ? data : [{ imageUrl:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200' }];
-  track.innerHTML = '';
-  dotsWrap.innerHTML = '';
-  for (var i=0; i<slides.length; i++) {
-    var div = document.createElement('div');
-    div.className = 'slide';
-    div.innerHTML = '<img src="'+slides[i].imageUrl+'" alt="" loading="lazy">';
+function initSlider(data){
+  slides=data.length?data:[{imageUrl:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200'}];
+  var track=document.getElementById('slides-track');
+  var dots=document.getElementById('slide-dots');
+  if(!track||!dots) return;
+  track.innerHTML=''; dots.innerHTML='';
+  for(var i=0;i<slides.length;i++){
+    var div=document.createElement('div'); div.className='slide';
+    div.innerHTML='<img src="'+slides[i].imageUrl+'" alt="" loading="lazy">';
     track.appendChild(div);
-    var dot = document.createElement('div');
-    dot.className = 'dot' + (i===0?' active':'');
-    (function(idx){ dot.onclick = function(){ goToSlide(idx); resetAuto(); }; })(i);
-    dotsWrap.appendChild(dot);
+    var dot=document.createElement('div'); dot.className='dot'+(i===0?' active':'');
+    (function(idx){ dot.onclick=function(){ goSlide(idx); restartTimer(); }; })(i);
+    dots.appendChild(dot);
   }
-  goToSlide(0);
-  resetAuto();
-}
-function goToSlide(n) {
-  currentSlide = ((n % slides.length) + slides.length) % slides.length;
-  var track = document.querySelector('.slides-track');
-  if (track) track.style.transform = 'translateX(-'+(currentSlide*100)+'%)';
-  var dots = document.querySelectorAll('.dot');
-  for (var i=0; i<dots.length; i++) dots[i].classList.toggle('active', i===currentSlide);
-}
-function resetAuto() {
-  clearInterval(autoSlide);
-  autoSlide = setInterval(function(){ goToSlide(currentSlide+1); }, 5000);
+  goSlide(0); restartTimer();
 }
 
-// ─── STATUS ──────────────────────────────────────
-function updateStatusBanner(status, msg) {
-  var banner = document.getElementById('status-banner');
-  if (!banner) return;
-  banner.textContent = msg || (status==='aberto'
-    ? '🟢 ¡Estamos ABIERTOS — Hacé tu pedido ahora!'
-    : '🔴 Estamos CERRADOS por el momento');
-  banner.className = status;
+function goSlide(n){
+  curSlide=((n%slides.length)+slides.length)%slides.length;
+  var track=document.getElementById('slides-track');
+  if(track) track.style.transform='translateX(-'+(curSlide*100)+'%)';
+  var dots=document.querySelectorAll('.dot');
+  for(var i=0;i<dots.length;i++) dots[i].classList.toggle('active',i===curSlide);
 }
 
-// ─── LOADING ─────────────────────────────────────
-function initLoading() {
-  var screen = document.getElementById('loading-screen');
-  var bar    = document.querySelector('.loading-bar');
-  if (!screen) return;
-  var pct = 0;
-  var steps = [15,20,15,20,15,15];
-  var si = 0;
-  function tick() {
-    if (si >= steps.length) {
-      if (bar) bar.style.width = '100%';
+function restartTimer(){ clearInterval(sliderTimer); sliderTimer=setInterval(function(){ goSlide(curSlide+1); },5000); }
+
+// ─── STATUS ─────────────────────────────────────
+function setStatus(status,msg){
+  var b=document.getElementById('status-banner');
+  if(!b) return;
+  b.textContent=msg||(status==='aberto'?'🟢 ¡Estamos ABIERTOS — Hacé tu pedido ahora!':'🔴 Estamos CERRADOS por el momento');
+  b.className=status;
+}
+
+// ─── LOADING ────────────────────────────────────
+function initLoading(){
+  var screen=document.getElementById('loading');
+  var bar=document.getElementById('load-bar');
+  if(!screen) return;
+  var pct=0; var steps=[15,20,15,20,15,15]; var si=0;
+  function tick(){
+    if(si>=steps.length){
+      if(bar) bar.style.width='100%';
       setTimeout(function(){
-        screen.classList.add('hidden');
+        screen.classList.add('out');
         setTimeout(function(){
-          screen.style.display = 'none';
-          screen.style.pointerEvents = 'none';
-          screen.style.visibility = 'hidden';
-        }, 900);
-      }, 300);
+          screen.style.display='none';
+        },900);
+      },300);
       return;
     }
-    pct += steps[si++];
-    if (bar) bar.style.width = Math.min(pct,100)+'%';
-    setTimeout(tick, 300+Math.random()*200);
+    pct+=steps[si++];
+    if(bar) bar.style.width=Math.min(pct,100)+'%';
+    setTimeout(tick,280+Math.random()*180);
   }
-  setTimeout(tick, 400);
-  setTimeout(function(){
-    screen.style.display = 'none';
-    screen.style.pointerEvents = 'none';
-    screen.style.visibility = 'hidden';
-  }, 6000);
+  setTimeout(tick,300);
+  // Fallback
+  setTimeout(function(){ screen.style.display='none'; },7000);
 }
 
-// ─── HAMBURGER ───────────────────────────────────
-function initHamburger() {
-  var btn     = document.getElementById('btn-hamburger');
-  var nav     = document.getElementById('main-nav');
-  var overlay = document.getElementById('nav-overlay');
-  if (!btn || !nav) return;
-  function openNav() {
-    nav.classList.add('open'); btn.classList.add('active');
-    if (overlay) overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeNav() {
-    nav.classList.remove('open'); btn.classList.remove('active');
-    if (overlay) overlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-  btn.onclick = function(){ nav.classList.contains('open') ? closeNav() : openNav(); };
-  if (overlay) overlay.onclick = closeNav;
-  var links = nav.querySelectorAll('a');
-  for (var i=0; i<links.length; i++) links[i].onclick = closeNav;
-  window.onresize = function(){ if (window.innerWidth > 768) closeNav(); };
+// ─── HAMBURGER ──────────────────────────────────
+function initHam(){
+  var btn=document.getElementById('btn-ham');
+  var nav=document.getElementById('main-nav');
+  var ov=document.getElementById('nav-overlay');
+  if(!btn||!nav) return;
+  function openNav(){ nav.classList.add('open'); btn.classList.add('open'); if(ov) ov.classList.add('show'); document.body.style.overflow='hidden'; }
+  function closeNav(){ nav.classList.remove('open'); btn.classList.remove('open'); if(ov) ov.classList.remove('show'); document.body.style.overflow=''; }
+  btn.onclick=function(){ nav.classList.contains('open')?closeNav():openNav(); };
+  if(ov) ov.onclick=closeNav;
+  var links=nav.querySelectorAll('a');
+  for(var i=0;i<links.length;i++) links[i].onclick=closeNav;
 }
 
-// ─── FIREBASE LISTENERS ──────────────────────────
-function loadFromFirebase() {
-  db.collection('products').onSnapshot(function(snap) {
-    allProducts = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
-      .filter(function(p){ return p.active !== false; });
-    buildCategoryBar(allProducts);
-    filterProducts(activeCategory);
+// ─── FIREBASE LISTENERS ─────────────────────────
+function startFirebase(){
+  db.collection('products').onSnapshot(function(snap){
+    allProducts=snap.docs.map(function(d){ var o=d.data(); o.id=d.id; return o; })
+      .filter(function(p){ return p.active!==false; });
+    buildCats(allProducts); filterCat(activeCat);
   });
-
-  db.collection('slides').onSnapshot(function(snap) {
-    var data = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
+  db.collection('slides').onSnapshot(function(snap){
+    var data=snap.docs.map(function(d){ var o=d.data(); o.id=d.id; return o; })
       .sort(function(a,b){ return (a.order||0)-(b.order||0); });
     initSlider(data);
   });
-
-  db.doc('config/status').onSnapshot(function(snap) {
-    if (snap.exists) updateStatusBanner(snap.data().status, snap.data().message);
+  db.doc('config/status').onSnapshot(function(snap){
+    if(snap.exists) setStatus(snap.data().status,snap.data().message);
   });
-
-  db.doc('config/logo').onSnapshot(function(snap) {
-    if (snap.exists && snap.data().url) {
-      var imgs = document.querySelectorAll('.logo-img');
-      for (var i=0; i<imgs.length; i++) {
-        imgs[i].src = snap.data().url;
-        imgs[i].style.display = 'block';
-      }
+  db.doc('config/logo').onSnapshot(function(snap){
+    if(snap.exists&&snap.data().url){
+      var img=document.getElementById('logo-img');
+      if(img){ img.src=snap.data().url; img.style.display='block'; }
     }
   });
 }
 
-// ─── INIT ────────────────────────────────────────
-window.onload = function() {
-  initLoading();
-  initHamburger();
-  refreshCartUI();
+// ─── CHECKOUT ───────────────────────────────────
+function sendOrder(){
+  var nombre=document.getElementById('f-nombre').value.trim();
+  var wpp=document.getElementById('f-wpp').value.trim();
+  var calle=document.getElementById('f-calle').value.trim();
+  var num=document.getElementById('f-num').value.trim();
+  var barrio=document.getElementById('f-barrio').value.trim();
+  if(!nombre||!wpp||!calle||!num||!barrio){ toast('⚠️ ¡Completá todos los campos!'); return; }
+  var total=cartTotal().toFixed(2).replace('.',',');
+  var items='';
+  for(var i=0;i<cart.length;i++) items+='• '+cart[i].name+' x'+cart[i].qty+' — $'+(cart[i].price*cart[i].qty).toFixed(2).replace('.',',')+'\n';
+  var msg=encodeURIComponent('🇧🇷 *Cocina Brasileña — Nuevo Pedido*\n\n👤 *Cliente:* '+nombre+'\n📱 *WhatsApp:* '+wpp+'\n📍 *Dirección:* '+calle+' '+num+', '+barrio+'\n\n📋 *Productos:*\n'+items+'\n💰 *Total: $'+total+'*');
+  window.open('https://wa.me/5513981763452?text='+msg,'_blank');
+  cart=[]; saveCart(); updateCartUI();
+  document.getElementById('checkout-modal').classList.remove('show');
+  toast('✅ ¡Pedido enviado!');
+}
 
-  // Carrinho
-  var btnsCart = document.querySelectorAll('.btn-cart');
-  for (var i=0; i<btnsCart.length; i++) btnsCart[i].onclick = openCart;
-  var cartClose = document.querySelector('.cart-close');
-  if (cartClose) cartClose.onclick = closeCart;
-  var cartOverlay = document.getElementById('cart-overlay');
-  if (cartOverlay) cartOverlay.onclick = closeCart;
+// ─── MAIN ───────────────────────────────────────
+window.onload=function(){
+  initLoading();
+  initHam();
+  updateCartUI();
+  startFirebase();
+
+  // Carrito
+  document.getElementById('btn-cart').onclick=openCart;
+  document.getElementById('cart-close').onclick=closeCart;
+  document.getElementById('cart-overlay').onclick=closeCart;
 
   // Checkout
-  var btnCheckout = document.querySelector('.btn-checkout');
-  if (btnCheckout) btnCheckout.onclick = function() {
-    if (!cart.length) { showToast('⚠️ ¡Agregá productos al carrito!'); return; }
+  document.getElementById('btn-checkout').onclick=function(){
+    if(!cart.length){ toast('⚠️ ¡Agregá productos al carrito!'); return; }
     closeCart();
-    var m = document.getElementById('checkout-modal');
-    if (m) m.classList.add('active');
+    document.getElementById('checkout-modal').classList.add('show');
   };
-  var btnCancel = document.querySelector('.btn-cancel');
-  if (btnCancel) btnCancel.onclick = function() {
-    var m = document.getElementById('checkout-modal');
-    if (m) m.classList.remove('active');
+  document.getElementById('btn-back').onclick=function(){
+    document.getElementById('checkout-modal').classList.remove('show');
   };
-  var btnConfirm = document.querySelector('.btn-confirm');
-  if (btnConfirm) btnConfirm.onclick = function() {
-    var nombre = document.getElementById('cust-name').value.trim();
-    var wpp    = document.getElementById('cust-wpp').value.trim();
-    var calle  = document.getElementById('cust-rua').value.trim();
-    var numero = document.getElementById('cust-num').value.trim();
-    var barrio = document.getElementById('cust-bairro').value.trim();
-    if (!nombre||!wpp||!calle||!numero||!barrio) { showToast('⚠️ ¡Completá todos los campos!'); return; }
-    var total = cartTotal().toFixed(2).replace('.',',');
-    var items = cart.map(function(i){ return '• '+i.name+' x'+i.qty+' — $'+(i.price*i.qty).toFixed(2).replace('.',','); }).join('\n');
-    var msg = encodeURIComponent('🇧🇷 *Cocina Brasileña — Nuevo Pedido*\n\n👤 *Cliente:* '+nombre+'\n📱 *WhatsApp:* '+wpp+'\n📍 *Dirección:* '+calle+' '+numero+', '+barrio+'\n\n📋 *Productos:*\n'+items+'\n\n💰 *Total: $'+total+'*');
-    window.open('https://wa.me/5513981763452?text='+msg, '_blank');
-    cart=[]; saveCart(); refreshCartUI();
-    document.getElementById('checkout-modal').classList.remove('active');
-    showToast('✅ ¡Pedido enviado por WhatsApp!');
-  };
+  document.getElementById('btn-send').onclick=sendOrder;
 
   // Slider
-  var prev = document.querySelector('.slider-btn.prev');
-  var next = document.querySelector('.slider-btn.next');
-  if (prev) prev.onclick = function(){ goToSlide(currentSlide-1); resetAuto(); };
-  if (next) next.onclick = function(){ goToSlide(currentSlide+1); resetAuto(); };
+  document.getElementById('btn-prev').onclick=function(){ goSlide(curSlide-1); restartTimer(); };
+  document.getElementById('btn-next').onclick=function(){ goSlide(curSlide+1); restartTimer(); };
 
   // Lightbox
-  var lbClose = document.querySelector('.lightbox-close');
-  var lb = document.getElementById('lightbox');
-  if (lbClose) lbClose.onclick = closeLightbox;
-  if (lb) lb.onclick = function(e){ if(e.target===lb) closeLightbox(); };
-
-  loadFromFirebase();
+  document.getElementById('lb-close').onclick=closeLightbox;
+  document.getElementById('lightbox').onclick=function(e){ if(e.target===this) closeLightbox(); };
 };
 </script>
 </body>
