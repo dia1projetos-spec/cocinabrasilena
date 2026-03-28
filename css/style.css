@@ -300,14 +300,17 @@ nav.main-nav li a.active { color: var(--amarelo); border-bottom-color: var(--ama
 }
 .product-card {
   background: #fff; border-radius: var(--radius);
-  overflow: hidden; box-shadow: var(--sombra-card);
+  box-shadow: var(--sombra-card);
   transition: var(--transition); position: relative;
   display: flex; flex-direction: column;
+  /* SEM overflow:hidden — causa bloqueio de toque no mobile */
 }
 .product-card:hover { transform: translateY(-6px); box-shadow: var(--sombra); }
 
 .product-img-wrap {
-  position: relative; overflow: hidden;
+  position: relative;
+  border-radius: var(--radius) var(--radius) 0 0;
+  overflow: hidden; /* overflow só na imagem, não no card inteiro */
   aspect-ratio: 4/3; cursor: zoom-in;
 }
 .product-img-wrap img {
@@ -360,12 +363,23 @@ nav.main-nav li a.active { color: var(--amarelo); border-bottom-color: var(--ama
 
 .btn-add {
   background: var(--verde);
-  color: #fff; padding: 9px 18px;
+  color: #fff; padding: 11px 18px;
   border-radius: 99px; font-weight: 700; font-size: 0.85rem;
-  display: flex; align-items: center; gap: 6px;
-  transition: var(--transition); white-space: nowrap;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: background 0.2s ease; white-space: nowrap;
+  /* Mobile: área de toque garantida, sem delay, sem interferência */
+  min-height: 44px; min-width: 44px;
+  pointer-events: auto;
+  position: relative; z-index: 10;
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(0,156,59,0.3);
+  touch-action: manipulation;
+  user-select: none;
+  border: none;
+  outline: none;
 }
-.btn-add:hover { background: var(--verde-escuro); transform: scale(1.04); }
+.btn-add:hover  { background: var(--verde-escuro); }
+.btn-add:active { background: var(--verde-escuro); transform: scale(0.96); }
 
 /* ─── LIGHTBOX ────────────────────────────────── */
 #lightbox {

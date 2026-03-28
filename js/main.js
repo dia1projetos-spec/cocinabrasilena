@@ -409,29 +409,30 @@ document.addEventListener('DOMContentLoaded', () => {
   lightbox      = document.getElementById('lightbox');
   lightboxImg   = document.getElementById('lightbox-img');
 
-  // ── EVENT DELEGATION para produtos (resolve bug mobile) ──
-  // Botões "Agregar" — usa data-attributes, sem onclick inline
-  document.getElementById('products-grid')?.addEventListener('click', e => {
-    // Botão adicionar ao carrinho
+  // ── EVENT DELEGATION para produtos ──
+  // Listener no document garante funcionamento em QUALQUER celular
+  function handleProductClick(e) {
     const btnAdd = e.target.closest('.btn-add');
     if (btnAdd) {
       e.preventDefault();
       e.stopPropagation();
       addToCart({
         id:       btnAdd.dataset.id,
-        name:     decodeURIComponent(btnAdd.dataset.name),
+        name:     decodeURIComponent(btnAdd.dataset.name || ''),
         price:    parseFloat(btnAdd.dataset.price),
-        imageUrl: decodeURIComponent(btnAdd.dataset.img)
+        imageUrl: decodeURIComponent(btnAdd.dataset.img || '')
       });
       return;
     }
-    // Lightbox — clique na imagem ou botão de zoom
     const imgWrap = e.target.closest('.product-img-wrap');
     if (imgWrap) {
       const src = decodeURIComponent(imgWrap.dataset.lightbox || '');
       if (src) openLightbox(src);
     }
-  });
+  }
+
+  document.addEventListener('click',      handleProductClick, { passive: false });
+  document.addEventListener('touchstart', handleProductClick, { passive: false });
 
   // ── Barra de categorias ──
   document.querySelector('.categories-bar')?.addEventListener('click', e => {
