@@ -135,6 +135,22 @@
   </div>
 </div>
 
+<!-- RULETA -->
+<div id="ruleta-modal">
+  <div class="ruleta-box">
+    <h2>🎰 ¡Girá la ruleta!</h2>
+    <p>Agregaste <strong id="ruleta-prod-name"></strong>.<br>¡Podés ganar un <strong id="ruleta-desc-pct"></strong> de descuento!</p>
+    <canvas id="ruleta-canvas" width="240" height="240"></canvas>
+    <div class="ruleta-pointer"></div>
+    <div class="ruleta-resultado" id="ruleta-resultado">
+      <span id="ruleta-pct"></span>
+      <span id="ruleta-txt"></span>
+    </div>
+    <button class="btn-girar" id="btn-girar">🎡 ¡Girar!</button>
+    <button class="btn-no-gracias" id="btn-no-gracias">No, gracias</button>
+  </div>
+</div>
+
 <!-- TOASTS -->
 <div id="toasts"></div>
 
@@ -155,6 +171,124 @@ firebase.initializeApp({
   appId:"1:807151796377:web:695aefc66e558952683808"
 });
 var db = firebase.firestore();
+
+// ─── RULETA ─────────────────────────────────────
+var ruletaGlobalEnabled = false;
+var ruletaUsada         = false; // una sola vez por visita
+var ruletaPendingPct    = 10;    // % del producto actual
+var ruletaPendingProduct = null;
+
+function listenRuleta(){
+  db.doc('config/ruleta').onSnapshot(function(snap){
+    ruletaGlobalEnabled = snap.exists && snap.data().enabled === true;
+  });
+}
+
+// Dibuja la ruleta. Segmentos con 4 colores alternados, todos muestran el % del producto
+function drawRuleta(pct, angle){
+  var canvas = document.getElementById('ruleta-canvas');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var cx=120, cy=120, r=110;
+  var labels = [pct+'%','🎉',pct+'%','🎊',pct+'%','🎉',pct+'%','🎊'];
+  var colors = ['#009C3B','#1a5c2e','#002776','#1a3a8a','#009C3B','#1a5c2e','#002776','#1a3a8a'];
+  var seg = (Math.PI*2) / 8;
+  ctx.clearRect(0,0,240,240);
+  for(var i=0;i<8;i++){
+    var s = angle + i*seg, e = s+seg;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,s,e); ctx.closePath();
+    ctx.fillStyle=colors[i]; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(s+seg/2);
+    ctx.textAlign='right'; ctx.fillStyle='#fff';
+    ctx.font='bold 14px Nunito,sans-serif';
+    ctx.fillText(labels[i], r-12, 5);
+    ctx.restore();
+  }
+  // Borde exterior
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.strokeStyle='#fff'; ctx.lineWidth=3; ctx.stroke();
+  // Centro
+  ctx.beginPath(); ctx.arc(cx,cy,18,0,Math.PI*2);
+  ctx.fillStyle='#FFDF00'; ctx.fill();
+  ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+}
+
+function tryOpenRuleta(id, name, price, img){
+  if(!ruletaGlobalEnabled) return;
+  if(ruletaUsada) return;
+
+  // Buscar el producto y ver si tiene ruleta habilitada y su propio %
+  var prod = null;
+  for(var i=0;i<allProducts.length;i++){
+    if(allProducts[i].id===id){ prod=allProducts[i]; break; }
+  }
+  if(!prod || !prod.ruletaEnabled) return;
+
+  // % individual del producto (si no tiene, usa 10 como default)
+  ruletaPendingPct = parseInt(prod.ruletaPct) || 10;
+  ruletaPendingProduct = {id:id, name:name, price:price, img:img};
+
+  // Reset UI
+  document.getElementById('ruleta-resultado').style.display='none';
+  var btnG=document.getElementById('btn-girar');
+  btnG.disabled=false; btnG.textContent='🎡 ¡Girar!'; btnG.onclick=girarRuleta;
+  document.getElementById('btn-no-gracias').style.display='';
+  document.getElementById('ruleta-prod-name').textContent=name;
+  document.getElementById('ruleta-desc-pct').textContent=ruletaPendingPct+'%';
+
+  drawRuleta(ruletaPendingPct, 0);
+  document.getElementById('ruleta-modal').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+
+function girarRuleta(){
+  var btn=document.getElementById('btn-girar');
+  btn.disabled=true; btn.textContent='Girando...';
+  var pct=ruletaPendingPct;
+  var duration=3800, startTime=null;
+  var totalRot=(Math.PI*2)*9 + (Math.PI/8);
+
+  function animate(ts){
+    if(!startTime) startTime=ts;
+    var p=Math.min((ts-startTime)/duration,1);
+    var ease=1-Math.pow(1-p,4);
+    drawRuleta(pct, ease*totalRot);
+    if(p<1){ requestAnimationFrame(animate); }
+    else { drawRuleta(pct,totalRot); mostrarResultadoRuleta(); }
+  }
+  requestAnimationFrame(animate);
+}
+
+function mostrarResultadoRuleta(){
+  var pct=ruletaPendingPct;
+  document.getElementById('ruleta-pct').textContent='🎉 ¡'+pct+'% de descuento!';
+  document.getElementById('ruleta-txt').textContent='¡Tu precio ya bajó en el carrito!';
+  document.getElementById('ruleta-resultado').style.display='block';
+  var btn=document.getElementById('btn-girar');
+  btn.textContent='¡Listo!'; btn.disabled=false;
+  btn.onclick=function(){ aplicarDescuentoRuleta(pct); };
+  document.getElementById('btn-no-gracias').style.display='none';
+  ruletaUsada=true;
+}
+
+function aplicarDescuentoRuleta(pct){
+  if(!ruletaPendingProduct){ cerrarRuleta(); return; }
+  var p=ruletaPendingProduct;
+  var newPrice=+(p.price*(1-pct/100)).toFixed(2);
+  for(var i=0;i<cart.length;i++){
+    if(cart[i].id===p.id){ cart[i].price=newPrice; cart[i].descuento=pct; break; }
+  }
+  saveCart(); updateCartUI(); cerrarRuleta();
+  toast('🎉 ¡'+pct+'% aplicado en '+p.name+'!');
+  ruletaPendingProduct=null;
+}
+
+function cerrarRuleta(){
+  document.getElementById('ruleta-modal').classList.remove('show');
+  document.body.style.overflow='';
+  document.getElementById('btn-girar').onclick=girarRuleta;
+}
 
 // ─── CART ───────────────────────────────────────
 var cart = [];
@@ -177,6 +311,8 @@ function addToCart(id,name,price,img){
   if(!found) cart.push({id:id,name:name,price:price,imageUrl:img,qty:1});
   saveCart(); updateCartUI();
   toast('🛒 ¡'+name+' agregado!');
+  // Intentar abrir ruleta (solo si está habilitada y no se usó)
+  tryOpenRuleta(id,name,price,img);
 }
 
 function removeItem(id){
@@ -404,6 +540,7 @@ function initHam(){
 
 // ─── FIREBASE LISTENERS ─────────────────────────
 function startFirebase(){
+  listenRuleta();
   db.collection('products').onSnapshot(function(snap){
     allProducts=snap.docs.map(function(d){ var o=d.data(); o.id=d.id; return o; })
       .filter(function(p){ return p.active!==false; });
@@ -473,6 +610,10 @@ window.onload=function(){
   // Lightbox
   document.getElementById('lb-close').onclick=closeLightbox;
   document.getElementById('lightbox').onclick=function(e){ if(e.target===this) closeLightbox(); };
+
+  // Ruleta
+  document.getElementById('btn-girar').onclick = girarRuleta;
+  document.getElementById('btn-no-gracias').onclick = cerrarRuleta;
 };
 </script>
 </body>

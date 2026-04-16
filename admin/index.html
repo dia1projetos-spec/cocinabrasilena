@@ -29,6 +29,7 @@
       <ul>
         <li><a onclick="showPanel('p-dash')" class="active">🏠 Dashboard</a></li>
         <li><a onclick="showPanel('p-status')">🟢 Estado del Local</a></li>
+        <li><a onclick="showPanel('p-ruleta')">🎰 Ruleta de Descuentos</a></li>
         <li><a onclick="showPanel('p-logo')">🏪 Logo</a></li>
         <li><a onclick="showPanel('p-slides')">🖼️ Slides / Banner</a></li>
         <li><a onclick="showPanel('p-products')">🍽️ Productos</a></li>
@@ -53,6 +54,31 @@
       <div class="card">
         <h4>🚀 Bienvenido al Panel Admin</h4>
         <p style="color:#888;font-size:.9rem;line-height:1.6">Usá el menú lateral para gestionar tu local. Todos los cambios se reflejan automáticamente en el sitio en tiempo real.</p>
+      </div>
+    </div>
+
+    <!-- RULETA -->
+    <div id="p-ruleta" class="panel">
+      <h2 class="panel-title">🎰 Ruleta de Descuentos</h2>
+
+      <div class="card">
+        <h4>⚙️ Activar / Desactivar Ruleta Global</h4>
+        <div class="status-row">
+          <p style="color:#888;font-size:.88rem;max-width:360px">Cuando está activa, aparece al agregar productos que tengan su propia ruleta habilitada. Cada producto tiene su propio porcentaje.</p>
+          <div style="display:flex;gap:12px">
+            <button class="btn-aberto" id="btn-ruleta-on">✅ ACTIVAR</button>
+            <button class="btn-cerrado" id="btn-ruleta-off">🔴 DESACTIVAR</button>
+          </div>
+        </div>
+        <button class="btn-primary" style="margin-top:18px" id="btn-save-ruleta">💾 Guardar</button>
+      </div>
+
+      <div class="card">
+        <h4>🍽️ Descuento por Producto</h4>
+        <p style="color:#888;font-size:.85rem;margin-bottom:16px">Activá la ruleta en cada producto y elegí el porcentaje. El cliente solo verá la ruleta si el switch global también está activo.</p>
+        <div id="ruleta-products-list">
+          <p style="color:#888;font-size:.875rem">Cargando productos...</p>
+        </div>
       </div>
     </div>
 
@@ -441,6 +467,7 @@ function listenProducts(){
   db.collection('products').onSnapshot(function(snap){
     allProds=snap.docs.map(function(d){ var o=d.data(); o.id=d.id; return o; });
     renderProds();
+    renderRuletaProducts();
     document.getElementById('d-prods').textContent=allProds.length;
   });
 }
@@ -478,12 +505,83 @@ function listenLogo(){
   });
 }
 
+// ─── RULETA ADMIN ────────────────────────────────
+var ruletaCfg = { enabled: false };
+
+function setupRuleta(){
+  db.doc('config/ruleta').onSnapshot(function(snap){
+    ruletaCfg.enabled = snap.exists && snap.data().enabled === true;
+    document.getElementById('btn-ruleta-on').classList.toggle('active', ruletaCfg.enabled);
+    document.getElementById('btn-ruleta-off').classList.toggle('active', !ruletaCfg.enabled);
+  });
+  document.getElementById('btn-ruleta-on').onclick  = function(){ ruletaCfg.enabled=true;  updateRuletaBtns(); };
+  document.getElementById('btn-ruleta-off').onclick = function(){ ruletaCfg.enabled=false; updateRuletaBtns(); };
+  document.getElementById('btn-save-ruleta').onclick = saveRuletaConfig;
+}
+
+function updateRuletaBtns(){
+  document.getElementById('btn-ruleta-on').classList.toggle('active', ruletaCfg.enabled);
+  document.getElementById('btn-ruleta-off').classList.toggle('active', !ruletaCfg.enabled);
+}
+
+function saveRuletaConfig(){
+  db.doc('config/ruleta').set({
+    enabled: ruletaCfg.enabled,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){ toast('¡Configuración de ruleta guardada!'); });
+}
+
+function renderRuletaProducts(){
+  var el = document.getElementById('ruleta-products-list');
+  if(!el) return;
+  if(!allProds.length){ el.innerHTML='<p style="color:#888;font-size:.875rem">No hay productos registrados.</p>'; return; }
+  var html = '<div style="display:flex;flex-direction:column;gap:10px">';
+  for(var i=0;i<allProds.length;i++){
+    var p = allProds[i];
+    var checked = p.ruletaEnabled ? 'checked' : '';
+    var pctVal  = p.ruletaPct || 10;
+    html +=
+      '<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:var(--r2);flex-wrap:wrap">'+
+        '<img src="'+(p.imageUrl||'')+'" style="width:52px;height:52px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.src=\'https://placehold.co/52x52/eee/999?text=?\'">'+
+        '<div style="flex:1;min-width:100px">'+
+          '<div style="font-weight:800;color:var(--azul);font-size:.88rem">'+(p.name||'')+'</div>'+
+          '<div style="color:var(--cinza);font-size:.8rem">$ '+parseFloat(p.price||0).toFixed(2).replace('.',',')+'</div>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
+          '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;font-size:.83rem;color:var(--verde)">'+
+            '<input type="checkbox" '+checked+' onchange="toggleRuletaProd(\''+p.id+'\',this.checked)" style="width:17px;height:17px;cursor:pointer">'+
+            'Ruleta'+
+          '</label>'+
+          '<select onchange="saveRuletaPct(\''+p.id+'\',this.value)" style="padding:5px 8px;border:2px solid #ddd;border-radius:6px;font-family:Nunito,sans-serif;font-size:.82rem;cursor:pointer">'+
+            '<option value="5"'+(pctVal==5?' selected':'')+'>5%</option>'+
+            '<option value="10"'+(pctVal==10?' selected':'')+'>10%</option>'+
+            '<option value="15"'+(pctVal==15?' selected':'')+'>15%</option>'+
+            '<option value="20"'+(pctVal==20?' selected':'')+'>20%</option>'+
+          '</select>'+
+        '</div>'+
+      '</div>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function toggleRuletaProd(id, enabled){
+  db.collection('products').doc(id).update({ ruletaEnabled: enabled })
+    .then(function(){ toast(enabled?'¡Ruleta activada para este producto!':'Ruleta desactivada'); });
+}
+
+function saveRuletaPct(id, pct){
+  db.collection('products').doc(id).update({ ruletaPct: parseInt(pct) })
+    .then(function(){ toast('¡Descuento actualizado: '+pct+'%!'); });
+}
+
 // ─── INIT ────────────────────────────────────────
 function initAdmin(){
   setupLogoUpload();
   setupStatus();
   setupSlides();
   setupProducts();
+  setupRuleta();
   listenLogo();
   listenSlides();
   listenProducts();

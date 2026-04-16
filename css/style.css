@@ -156,7 +156,28 @@ nav.main-nav a:hover,nav.main-nav a.active{color:var(--amarelo);border-bottom-co
 }
 .btn-add:active{background:var(--verde2);transform:scale(.96)}
 
-/* LIGHTBOX */
+/* RULETA */
+#ruleta-modal{position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:16px}
+#ruleta-modal.show{opacity:1;pointer-events:all}
+.ruleta-box{background:#fff;border-radius:20px;padding:28px 24px 24px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:pop-in .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop-in{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.ruleta-box h2{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--azul);margin-bottom:4px}
+.ruleta-box p{color:var(--cinza);font-size:.9rem;margin-bottom:20px}
+
+/* Canvas de la ruleta */
+#ruleta-canvas{display:block;margin:0 auto 18px;border-radius:50%;box-shadow:0 4px 20px rgba(0,39,118,.25)}
+
+/* Indicador (puntero) */
+.ruleta-pointer{width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:22px solid #c0392b;margin:0 auto;margin-top:-4px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
+
+.ruleta-resultado{display:none;margin:10px 0 16px;padding:14px;background:linear-gradient(135deg,var(--verde),#007a30);color:#fff;border-radius:12px;font-size:1.1rem;font-weight:800}
+.ruleta-resultado span{font-size:1.8rem;display:block;margin-bottom:2px}
+
+.btn-girar{width:100%;padding:14px;background:linear-gradient(135deg,var(--azul),var(--azul2));color:#fff;border-radius:12px;font-size:1rem;font-weight:800;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:.2s;margin-bottom:10px}
+.btn-girar:active{opacity:.85}
+.btn-girar:disabled{opacity:.5;cursor:not-allowed}
+.btn-no-gracias{width:100%;padding:10px;color:var(--cinza);font-size:.88rem;font-weight:600;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.btn-no-gracias:active{opacity:.6}
 #lightbox{position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
 #lightbox.show{opacity:1;pointer-events:all}
 .lb-inner{position:relative;max-width:92vw;max-height:90vh}
