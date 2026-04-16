@@ -139,7 +139,7 @@
 <div id="ruleta-modal">
   <div class="ruleta-box">
     <h2>🎰 ¡Girá la ruleta!</h2>
-    <p>Agregaste <strong id="ruleta-prod-name"></strong>.<br>¡Podés ganar un <strong id="ruleta-desc-pct"></strong> de descuento!</p>
+    <p>Agregaste <strong id="ruleta-prod-name"></strong>.<br>¡Girá y ganá un descuento especial!</p>
     <canvas id="ruleta-canvas" width="240" height="240"></canvas>
     <div class="ruleta-pointer"></div>
     <div class="ruleta-resultado" id="ruleta-resultado">
@@ -184,48 +184,85 @@ function listenRuleta(){
   });
 }
 
-// Dibuja la ruleta. Segmentos con 4 colores alternados, todos muestran el % del producto
-function drawRuleta(pct, angle){
+// Dibuja la ruleta con los 4 valores reales: 5%, 10%, 15%, 20%
+// Los segmentos se repiten 2 veces cada uno (8 en total) para que se vea más vistosa
+// Orden fijo: 5, 15, 20, 10, 5, 15, 20, 10  (mezclados para parecer aleatorio)
+var RULETA_LABELS = ['5%','15%','20%','10%','5%','15%','20%','10%'];
+var RULETA_COLORS = ['#009C3B','#002776','#c0392b','#1a3a8a','#27ae60','#1a5c8a','#e74c3c','#002776'];
+var RULETA_SEGS   = 8;
+
+function drawRuleta(angle){
   var canvas = document.getElementById('ruleta-canvas');
   if(!canvas) return;
   var ctx = canvas.getContext('2d');
-  var cx=120, cy=120, r=110;
-  var labels = [pct+'%','🎉',pct+'%','🎊',pct+'%','🎉',pct+'%','🎊'];
-  var colors = ['#009C3B','#1a5c2e','#002776','#1a3a8a','#009C3B','#1a5c2e','#002776','#1a3a8a'];
-  var seg = (Math.PI*2) / 8;
+  var cx=120, cy=120, r=108;
+  var seg = (Math.PI*2) / RULETA_SEGS;
   ctx.clearRect(0,0,240,240);
-  for(var i=0;i<8;i++){
-    var s = angle + i*seg, e = s+seg;
+
+  for(var i=0;i<RULETA_SEGS;i++){
+    var s = angle + i*seg;
+    var e = s + seg;
+    // Sector
     ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,s,e); ctx.closePath();
-    ctx.fillStyle=colors[i]; ctx.fill();
-    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-    ctx.save(); ctx.translate(cx,cy); ctx.rotate(s+seg/2);
-    ctx.textAlign='right'; ctx.fillStyle='#fff';
-    ctx.font='bold 14px Nunito,sans-serif';
-    ctx.fillText(labels[i], r-12, 5);
+    ctx.fillStyle = RULETA_COLORS[i]; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2.5; ctx.stroke();
+    // Texto
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(s + seg/2);
+    ctx.textAlign='right';
+    ctx.fillStyle='#fff';
+    ctx.font='bold 15px Nunito,Arial,sans-serif';
+    ctx.shadowColor='rgba(0,0,0,0.4)';
+    ctx.shadowBlur=3;
+    ctx.fillText(RULETA_LABELS[i], r-10, 5);
     ctx.restore();
   }
   // Borde exterior
   ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-  ctx.strokeStyle='#fff'; ctx.lineWidth=3; ctx.stroke();
-  // Centro
-  ctx.beginPath(); ctx.arc(cx,cy,18,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=3; ctx.stroke();
+  // Centro dorado
+  ctx.beginPath(); ctx.arc(cx,cy,20,0,Math.PI*2);
   ctx.fillStyle='#FFDF00'; ctx.fill();
-  ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+  ctx.strokeStyle='#fff'; ctx.lineWidth=2.5; ctx.stroke();
+  // Estrellita en centro
+  ctx.fillStyle='#002776';
+  ctx.font='bold 14px Arial';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText('★', cx, cy);
+}
+
+// Calcula el ángulo necesario para que el puntero (arriba, -π/2) apunte al segmento del %
+function calcAngleForPct(pct){
+  // Posición del label en RULETA_LABELS (usa el primer que coincida)
+  var targetIdx = 0;
+  var target = pct + '%';
+  for(var i=0;i<RULETA_LABELS.length;i++){
+    if(RULETA_LABELS[i] === target){ targetIdx = i; break; }
+  }
+  var seg = (Math.PI*2) / RULETA_SEGS;
+  // El puntero apunta hacia arriba = -PI/2
+  // El centro del segmento targetIdx está en: targetIdx*seg + seg/2
+  // Para que ese centro quede arriba, la rotación de la ruleta debe ser:
+  // angle = -PI/2 - (targetIdx*seg + seg/2)
+  // Normalizamos a positivo
+  var angle = -Math.PI/2 - (targetIdx * seg + seg/2);
+  // Asegurar positivo
+  while(angle < 0) angle += Math.PI*2;
+  return angle;
 }
 
 function tryOpenRuleta(id, name, price, img){
   if(!ruletaGlobalEnabled) return;
   if(ruletaUsada) return;
 
-  // Buscar el producto y ver si tiene ruleta habilitada y su propio %
   var prod = null;
   for(var i=0;i<allProducts.length;i++){
     if(allProducts[i].id===id){ prod=allProducts[i]; break; }
   }
   if(!prod || !prod.ruletaEnabled) return;
 
-  // % individual del producto (si no tiene, usa 10 como default)
   ruletaPendingPct = parseInt(prod.ruletaPct) || 10;
   ruletaPendingProduct = {id:id, name:name, price:price, img:img};
 
@@ -235,9 +272,9 @@ function tryOpenRuleta(id, name, price, img){
   btnG.disabled=false; btnG.textContent='🎡 ¡Girar!'; btnG.onclick=girarRuleta;
   document.getElementById('btn-no-gracias').style.display='';
   document.getElementById('ruleta-prod-name').textContent=name;
-  document.getElementById('ruleta-desc-pct').textContent=ruletaPendingPct+'%';
+  document.getElementById('ruleta-desc-pct').textContent='un descuento especial';
 
-  drawRuleta(ruletaPendingPct, 0);
+  drawRuleta(0);
   document.getElementById('ruleta-modal').classList.add('show');
   document.body.style.overflow='hidden';
 }
@@ -245,17 +282,29 @@ function tryOpenRuleta(id, name, price, img){
 function girarRuleta(){
   var btn=document.getElementById('btn-girar');
   btn.disabled=true; btn.textContent='Girando...';
-  var pct=ruletaPendingPct;
-  var duration=3800, startTime=null;
-  var totalRot=(Math.PI*2)*9 + (Math.PI/8);
+
+  var pct = ruletaPendingPct;
+  // Ángulo final donde debe parar el segmento ganador
+  var finalAngle = calcAngleForPct(pct);
+  // Muchas vueltas completas + el ángulo final (hace que parezca aleatorio)
+  var vueltas = 8 + Math.floor(Math.random()*3); // 8-10 vueltas
+  var totalRot = (Math.PI*2) * vueltas + finalAngle;
+
+  var duration = 4200;
+  var startTime = null;
 
   function animate(ts){
     if(!startTime) startTime=ts;
-    var p=Math.min((ts-startTime)/duration,1);
-    var ease=1-Math.pow(1-p,4);
-    drawRuleta(pct, ease*totalRot);
-    if(p<1){ requestAnimationFrame(animate); }
-    else { drawRuleta(pct,totalRot); mostrarResultadoRuleta(); }
+    var progress = Math.min((ts-startTime)/duration, 1);
+    // easeOut cúbico — desacelera gradualmente, muy natural
+    var ease = 1 - Math.pow(1-progress, 4);
+    drawRuleta(ease * totalRot);
+    if(progress < 1){
+      requestAnimationFrame(animate);
+    } else {
+      drawRuleta(totalRot); // dibuja posición exacta final
+      mostrarResultadoRuleta();
+    }
   }
   requestAnimationFrame(animate);
 }
