@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Cocina Brasileña</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">Cocina Brasileña</div>
+    <div class="login-sub">Área Administrativa</div>
+    <div class="fg"><label>E-mail</label><input id="l-email" type="email" placeholder="admin@email.com" autocomplete="email"></div>
+    <div class="fg"><label>Contraseña</label><input id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn-login" id="btn-login">🔑 Entrar</button>
+    <p class="login-err" id="login-err"></p>
+    <span class="back-link"><a href="../">← Volver al sitio</a></span>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-page" style="display:none">
+  <aside class="sidebar">
+    <div class="sb-brand">Cocina Brasileña<small>Panel Admin</small></div>
+    <nav class="sb-nav">
+      <ul>
+        <li><a onclick="showPanel('p-dash')" class="active">🏠 Dashboard</a></li>
+        <li><a onclick="showPanel('p-status')">🟢 Estado del Local</a></li>
+        <li><a onclick="showPanel('p-ruleta')">🎰 Ruleta de Descuentos</a></li>
+        <li><a onclick="showPanel('p-logo')">🏪 Logo</a></li>
+        <li><a onclick="showPanel('p-slides')">🖼️ Slides / Banner</a></li>
+        <li><a onclick="showPanel('p-products')">🍽️ Productos</a></li>
+      </ul>
+    </nav>
+    <div class="sb-footer">
+      <div class="btn-viewsite" onclick="window.open('../','_blank')">🌐 Ver Sitio</div>
+      <button class="btn-logout" id="btn-logout">🚪 Salir</button>
+    </div>
+  </aside>
+
+  <main class="admin-content">
+
+    <!-- DASHBOARD -->
+    <div id="p-dash" class="panel active">
+      <h2 class="panel-title">🏠 Dashboard</h2>
+      <div class="dash-grid">
+        <div class="dash-card"><div class="icon">🍽️</div><div class="num" id="d-prods">—</div><div class="lbl">Productos</div></div>
+        <div class="dash-card"><div class="icon">🖼️</div><div class="num" id="d-slides">—</div><div class="lbl">Slides</div></div>
+        <div class="dash-card"><div class="icon">📱</div><div class="num" style="font-size:1rem">+55 13 98176-3452</div><div class="lbl">WhatsApp</div></div>
+      </div>
+      <div class="card">
+        <h4>🚀 Bienvenido al Panel Admin</h4>
+        <p style="color:#888;font-size:.9rem;line-height:1.6">Usá el menú lateral para gestionar tu local. Todos los cambios se reflejan automáticamente en el sitio en tiempo real.</p>
+      </div>
+    </div>
+
+    <!-- RULETA -->
+    <div id="p-ruleta" class="panel">
+      <h2 class="panel-title">🎰 Ruleta de Descuentos</h2>
+
+      <div class="card">
+        <h4>⚙️ Activar / Desactivar Ruleta Global</h4>
+        <div class="status-row">
+          <p style="color:#888;font-size:.88rem;max-width:360px">Cuando está activa, aparece al agregar productos que tengan su propia ruleta habilitada. Cada producto tiene su propio porcentaje.</p>
+          <div style="display:flex;gap:12px">
+            <button class="btn-aberto" id="btn-ruleta-on">✅ ACTIVAR</button>
+            <button class="btn-cerrado" id="btn-ruleta-off">🔴 DESACTIVAR</button>
+          </div>
+        </div>
+        <button class="btn-primary" style="margin-top:18px" id="btn-save-ruleta">💾 Guardar</button>
+      </div>
+
+      <div class="card">
+        <h4>🍽️ Descuento por Producto</h4>
+        <p style="color:#888;font-size:.85rem;margin-bottom:16px">Activá la ruleta en cada producto y elegí el porcentaje. El cliente solo verá la ruleta si el switch global también está activo.</p>
+        <div id="ruleta-products-list">
+          <p style="color:#888;font-size:.875rem">Cargando productos...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATUS -->
+    <div id="p-status" class="panel">
+      <h2 class="panel-title">🟢 Estado del Local</h2>
+      <div class="card">
+        <h4>📢 ¿Abierto o Cerrado?</h4>
+        <div class="status-row">
+          <p style="color:#888;font-size:.88rem;max-width:340px">El estado aparece destacado en la parte superior del sitio para todos los clientes.</p>
+          <div style="display:flex;gap:12px">
+            <button class="btn-aberto" id="btn-aberto">✅ ABIERTO</button>
+            <button class="btn-cerrado" id="btn-cerrado">🔴 CERRADO</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h4>✏️ Mensaje Personalizado (opcional)</h4>
+        <div class="fg-admin">
+          <label>Mensaje en el banner</label>
+          <input id="status-msg" type="text" placeholder="Ej: ¡Estamos abiertos! Pedidos hasta las 22hs">
+        </div>
+        <p style="color:#888;font-size:.82rem">Si está vacío, se mostrará un mensaje predeterminado. Hacé clic en ABIERTO o CERRADO para guardar.</p>
+      </div>
+    </div>
+
+    <!-- LOGO -->
+    <div id="p-logo" class="panel">
+      <h2 class="panel-title">🏪 Logo del Local</h2>
+      <div class="card">
+        <h4>Logo Actual</h4>
+        <div class="logo-prev-wrap">
+          <div class="logo-placeholder" id="logo-placeholder">🏪</div>
+          <img class="logo-prev" id="logo-preview" src="" alt="Logo">
+          <div>
+            <p style="font-size:.88rem;color:#888;margin-bottom:10px">El logo aparece en el encabezado del sitio.</p>
+            <button class="btn-danger" id="btn-remove-logo" style="display:none">🗑️ Eliminar Logo</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h4>📤 Subir Nuevo Logo</h4>
+        <div class="upload-zone" id="logo-zone">
+          <div class="icon">🖼️</div>
+          <p>Hacé clic o arrastrá una imagen aquí</p>
+          <p style="font-size:.75rem;margin-top:4px;color:#aaa">PNG, JPG · Recomendado: 200×200px</p>
+          <input type="file" id="logo-file" accept="image/*">
+          <div class="prog-wrap" id="logo-prog">
+            <div class="prog-bg"><div class="prog-fill" id="logo-fill"></div></div>
+            <div class="prog-txt" id="logo-txt">Subiendo...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDES -->
+    <div id="p-slides" class="panel">
+      <h2 class="panel-title">🖼️ Slides / Banner</h2>
+      <div class="card">
+        <h4>➕ Agregar Slide</h4>
+        <div class="upload-zone" id="slide-zone">
+          <div class="icon">📷</div>
+          <p>Hacé clic o arrastrá la imagen del slide</p>
+          <p style="font-size:.75rem;margin-top:4px;color:#aaa">Recomendado: 1200×500px (horizontal)</p>
+          <input type="file" id="slide-file" accept="image/*">
+          <div class="prog-wrap" id="slide-prog">
+            <div class="prog-bg"><div class="prog-fill" id="slide-fill"></div></div>
+            <div class="prog-txt" id="slide-txt">Subiendo...</div>
+          </div>
+        </div>
+        <div id="slide-preview" style="margin-top:10px"></div>
+        <div class="form-row" style="margin-top:16px">
+          <div class="fg-admin"><label>Título (opcional)</label><input id="slide-title" type="text" placeholder="Ej: ¡Promo del Lunes!"></div>
+          <div class="fg-admin"><label>Subtítulo (opcional)</label><input id="slide-sub" type="text" placeholder="Ej: Feijoada con 10% off"></div>
+        </div>
+        <button class="btn-primary" id="btn-add-slide">➕ Agregar Slide</button>
+      </div>
+      <div class="card">
+        <h4>📋 Slides Registrados</h4>
+        <div class="slides-grid" id="slides-list"><p style="color:#888;font-size:.875rem">Cargando...</p></div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div id="p-products" class="panel">
+      <h2 class="panel-title">🍽️ Gestionar Productos</h2>
+      <div class="card">
+        <h4>➕ Agregar Producto</h4>
+        <div class="fg-admin">
+          <label>Foto del Producto</label>
+          <div class="upload-zone" id="prod-zone">
+            <div class="icon">🍽️</div>
+            <p>Hacé clic o arrastrá la foto del producto</p>
+            <p style="font-size:.75rem;margin-top:4px;color:#aaa">Recomendado: 400×300px</p>
+            <input type="file" id="prod-file" accept="image/*">
+            <div class="prog-wrap" id="prod-prog">
+              <div class="prog-bg"><div class="prog-fill" id="prod-fill"></div></div>
+              <div class="prog-txt" id="prod-txt">Subiendo...</div>
+            </div>
+          </div>
+          <div id="prod-img-preview" style="margin-top:10px"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg-admin"><label>Nombre *</label><input id="prod-name" type="text" placeholder="Ej: Feijoada Completa"></div>
+          <div class="fg-admin"><label>Precio ($) *</label><input id="prod-price" type="number" step="0.01" min="0" placeholder="0.00"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg-admin"><label>Categoría</label><input id="prod-cat" type="text" placeholder="Ej: Platos, Bebidas, Postres"></div>
+          <div class="fg-admin"><label>Etiqueta</label><input id="prod-badge" type="text" placeholder="Ej: Nuevo, Destacado, Promo"></div>
+        </div>
+        <div class="fg-admin"><label>Descripción</label><textarea id="prod-desc" rows="3" placeholder="Describí los ingredientes y sabores..."></textarea></div>
+        <button class="btn-primary" id="btn-save-prod">✅ Guardar Producto</button>
+      </div>
+      <div class="card">
+        <h4>📋 Productos Registrados</h4>
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead><tr><th>Foto</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="prod-tbody"><tr><td colspan="6" style="text-align:center;padding:36px;color:#888">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="a-toasts"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+
+firebase.initializeApp({
+  apiKey:"AIzaSyBfxMRk_UdCBZkg60omMZnh1WZH5FJ04FI",
+  authDomain:"cocina-brasilena.firebaseapp.com",
+  projectId:"cocina-brasilena",
+  storageBucket:"cocina-brasilena.firebasestorage.app",
+  messagingSenderId:"807151796377",
+  appId:"1:807151796377:web:695aefc66e558952683808"
+});
+var db=firebase.firestore();
+var auth=firebase.auth();
+var CLOUD='dc0bxgeea';
+var PRESET='cocina_upload';
+
+// ─── TOAST ──────────────────────────────────────
+function toast(msg,type){
+  var c=document.getElementById('a-toasts');
+  var t=document.createElement('div');
+  t.className='toast '+(type||'ok');
+  t.textContent=msg; c.appendChild(t);
+  setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },3200);
+}
+
+// ─── PANEL NAV ──────────────────────────────────
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.sb-nav a').forEach(function(a){ a.classList.remove('active'); });
+}
+
+// ─── AUTH ────────────────────────────────────────
+auth.onAuthStateChanged(function(user){
+  if(user){
+    document.getElementById('login-page').style.display='none';
+    document.getElementById('admin-page').style.display='flex';
+    initAdmin();
+  } else {
+    document.getElementById('login-page').style.display='flex';
+    document.getElementById('admin-page').style.display='none';
+  }
+});
+
+document.getElementById('btn-login').onclick=function(){
+  var email=document.getElementById('l-email').value.trim();
+  var pass=document.getElementById('l-pass').value;
+  var errEl=document.getElementById('login-err');
+  errEl.style.display='none';
+  this.textContent='Entrando...'; this.disabled=true;
+  var btn=this;
+  auth.signInWithEmailAndPassword(email,pass).catch(function(e){
+    errEl.style.display='block';
+    var msgs={'auth/invalid-credential':'E-mail o contraseña incorrectos.','auth/user-not-found':'Usuario no encontrado.','auth/wrong-password':'Contraseña incorrecta.','auth/too-many-requests':'Demasiados intentos. Esperá unos minutos.'};
+    errEl.textContent=msgs[e.code]||('Error: '+e.code);
+  }).finally(function(){ btn.textContent='🔑 Entrar'; btn.disabled=false; });
+};
+
+document.getElementById('btn-logout').onclick=function(){
+  if(confirm('¿Querés salir del panel?')) auth.signOut();
+};
+
+// ─── CLOUDINARY UPLOAD ───────────────────────────
+function uploadImage(file, progFill, progTxt, progWrap, cb){
+  if(!file) return;
+  progWrap.style.display='block';
+  var fd=new FormData();
+  fd.append('file',file); fd.append('upload_preset',PRESET);
+  var xhr=new XMLHttpRequest();
+  xhr.open('POST','https://api.cloudinary.com/v1_1/'+CLOUD+'/image/upload');
+  xhr.upload.onprogress=function(e){
+    if(e.lengthComputable){ var p=Math.round(e.loaded/e.total*100); progFill.style.width=p+'%'; progTxt.textContent='Subiendo '+p+'%...'; }
+  };
+  xhr.onload=function(){
+    var res=JSON.parse(xhr.responseText);
+    progWrap.style.display='none'; progFill.style.width='0%';
+    if(xhr.status===200) cb(res.secure_url);
+    else { toast('Error al subir imagen: '+(res.error&&res.error.message||'desconocido'),'err'); }
+  };
+  xhr.onerror=function(){ progWrap.style.display='none'; toast('Error de red al subir','err'); };
+  xhr.send(fd);
+}
+
+// ─── LOGO ────────────────────────────────────────
+var currentLogoUrl='';
+function setupLogoUpload(){
+  var zone=document.getElementById('logo-zone');
+  var file=document.getElementById('logo-file');
+  zone.onclick=function(){ file.click(); };
+  zone.ondragover=function(e){ e.preventDefault(); zone.classList.add('over'); };
+  zone.ondragleave=function(){ zone.classList.remove('over'); };
+  zone.ondrop=function(e){ e.preventDefault(); zone.classList.remove('over'); if(e.dataTransfer.files[0]) handleLogo(e.dataTransfer.files[0]); };
+  file.onchange=function(){ if(file.files[0]) handleLogo(file.files[0]); };
+
+  document.getElementById('btn-remove-logo').onclick=function(){
+    if(!confirm('¿Eliminar el logo?')) return;
+    db.doc('config/logo').set({url:''}).then(function(){
+      currentLogoUrl=''; renderLogo(''); toast('¡Logo eliminado!');
+    });
+  };
+}
+
+function handleLogo(f){
+  uploadImage(f,document.getElementById('logo-fill'),document.getElementById('logo-txt'),document.getElementById('logo-prog'),function(url){
+    db.doc('config/logo').set({url:url,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){
+      currentLogoUrl=url; renderLogo(url); toast('¡Logo actualizado!');
+    });
+  });
+}
+
+function renderLogo(url){
+  var prev=document.getElementById('logo-preview');
+  var ph=document.getElementById('logo-placeholder');
+  var btn=document.getElementById('btn-remove-logo');
+  if(url){ prev.src=url; prev.style.display='block'; ph.style.display='none'; btn.style.display=''; }
+  else { prev.style.display='none'; ph.style.display='flex'; btn.style.display='none'; }
+}
+
+// ─── STATUS ──────────────────────────────────────
+function setupStatus(){
+  db.doc('config/status').get().then(function(snap){
+    if(snap.exists){
+      var d=snap.data();
+      document.getElementById('status-msg').value=d.message||'';
+      if(d.status==='aberto') document.getElementById('btn-aberto').classList.add('active');
+      else document.getElementById('btn-cerrado').classList.add('active');
+    }
+  });
+  document.getElementById('btn-aberto').onclick=function(){ saveStatus('aberto'); };
+  document.getElementById('btn-cerrado').onclick=function(){ saveStatus('cerrado'); };
+}
+
+function saveStatus(s){
+  var msg=document.getElementById('status-msg').value.trim();
+  db.doc('config/status').set({status:s,message:msg,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){
+    document.querySelectorAll('.btn-aberto,.btn-cerrado').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelector('.btn-'+s).classList.add('active');
+    toast('Estado actualizado: '+s.toUpperCase());
+  });
+}
+
+// ─── SLIDES ──────────────────────────────────────
+var slideImgUrl='';
+var allSlides=[];
+
+function setupSlides(){
+  var zone=document.getElementById('slide-zone');
+  var file=document.getElementById('slide-file');
+  zone.onclick=function(){ file.click(); };
+  zone.ondragover=function(e){ e.preventDefault(); zone.classList.add('over'); };
+  zone.ondragleave=function(){ zone.classList.remove('over'); };
+  zone.ondrop=function(e){ e.preventDefault(); zone.classList.remove('over'); if(e.dataTransfer.files[0]) handleSlideImg(e.dataTransfer.files[0]); };
+  file.onchange=function(){ if(file.files[0]) handleSlideImg(file.files[0]); };
+  document.getElementById('btn-add-slide').onclick=saveSlide;
+}
+
+function handleSlideImg(f){
+  uploadImage(f,document.getElementById('slide-fill'),document.getElementById('slide-txt'),document.getElementById('slide-prog'),function(url){
+    slideImgUrl=url;
+    document.getElementById('slide-preview').innerHTML='<img src="'+url+'" style="max-width:220px;border-radius:8px;margin-top:4px">';
+    toast('¡Imagen subida!');
+  });
+}
+
+function saveSlide(){
+  if(!slideImgUrl){ toast('¡Subí una imagen primero!','err'); return; }
+  db.collection('slides').add({
+    imageUrl:slideImgUrl,
+    title:document.getElementById('slide-title').value.trim(),
+    subtitle:document.getElementById('slide-sub').value.trim(),
+    order:allSlides.length,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    slideImgUrl='';
+    document.getElementById('slide-preview').innerHTML='';
+    document.getElementById('slide-title').value='';
+    document.getElementById('slide-sub').value='';
+    toast('¡Slide agregado!');
+  });
+}
+
+function listenSlides(){
+  db.collection('slides').onSnapshot(function(snap){
+    allSlides=snap.docs.map(function(d){ var o=d.data(); o.id=d.id; return o; }).sort(function(a,b){ return (a.order||0)-(b.order||0); });
+    renderSlides();
+    document.getElementById('d-slides').textContent=allSlides.length;
+  });
+}
+
+function renderSlides(){
+  var el=document.getElementById('slides-list');
+  if(!allSlides.length){ el.innerHTML='<p style="color:#888;font-size:.875rem">No hay slides registrados aún.</p>'; return; }
+  var html='';
+  for(var i=0;i<allSlides.length;i++){
+    var s=allSlides[i];
+    html+='<div class="slide-card">'+
+      '<img src="'+s.imageUrl+'" alt="">'+
+      '<div class="slide-card-body">'+
+        '<p>'+(s.title||'Sin título')+'</p>'+
+        '<button class="btn-danger" onclick="deleteSlide(\''+s.id+'\')">🗑️ Eliminar</button>'+
+      '</div>'+
+    '</div>';
+  }
+  el.innerHTML=html;
+}
+
+function deleteSlide(id){
+  if(!confirm('¿Eliminar este slide?')) return;
+  db.collection('slides').doc(id).delete().then(function(){ toast('¡Slide eliminado!'); });
+}
+
+// ─── PRODUCTS ────────────────────────────────────
+var prodImgUrl='';
+var allProds=[];
+
+function setupProducts(){
+  var zone=document.getElementById('prod-zone');
+  var file=document.getElementById('prod-file');
+  zone.onclick=function(){ file.click(); };
+  zone.ondragover=function(e){ e.preventDefault(); zone.classList.add('over'); };
+  zone.ondragleave=function(){ zone.classList.remove('over'); };
+  zone.ondrop=function(e){ e.preventDefault(); zone.classList.remove('over'); if(e.dataTransfer.files[0]) handleProdImg(e.dataTransfer.files[0]); };
+  file.onchange=function(){ if(file.files[0]) handleProdImg(file.files[0]); };
+  document.getElementById('btn-save-prod').onclick=saveProduct;
+}
+
+function handleProdImg(f){
+  uploadImage(f,document.getElementById('prod-fill'),document.getElementById('prod-txt'),document.getElementById('prod-prog'),function(url){
+    prodImgUrl=url;
+    document.getElementById('prod-img-preview').innerHTML='<img src="'+url+'" style="max-width:120px;border-radius:8px;margin-top:4px">';
+    toast('¡Imagen subida!');
+  });
+}
+
+function saveProduct(){
+  var name=document.getElementById('prod-name').value.trim();
+  var price=parseFloat(document.getElementById('prod-price').value);
+  if(!name||isNaN(price)){ toast('¡Completá nombre y precio!','err'); return; }
+  db.collection('products').add({
+    name:name, price:price,
+    description:document.getElementById('prod-desc').value.trim(),
+    category:document.getElementById('prod-cat').value.trim(),
+    badge:document.getElementById('prod-badge').value.trim(),
+    imageUrl:prodImgUrl, active:true,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    ['prod-name','prod-price','prod-desc','prod-cat','prod-badge'].forEach(function(id){ document.getElementById(id).value=''; });
+    prodImgUrl=''; document.getElementById('prod-img-preview').innerHTML='';
+    toast('¡Producto guardado!');
+  }).catch(function(e){ toast('Error: '+e.message,'err'); });
+}
+
+function listenProducts(){
+  db.collection('products').onSnapshot(function(snap){
+    allProds=snap.docs.map(function(d){ var o=d.data(); o.id=d.id; return o; });
+    renderProds();
+    renderRuletaProducts();
+    document.getElementById('d-prods').textContent=allProds.length;
+  });
+}
+
+function renderProds(){
+  var tbody=document.getElementById('prod-tbody');
+  if(!allProds.length){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:36px;color:#888">No hay productos registrados aún.</td></tr>'; return; }
+  var html='';
+  for(var i=0;i<allProds.length;i++){
+    var p=allProds[i];
+    html+='<tr>'+
+      '<td><img src="'+(p.imageUrl||'')+'" onerror="this.src=\'https://placehold.co/56x56/eee/999?text=?\'"></td>'+
+      '<td><strong>'+(p.name||'')+'</strong></td>'+
+      '<td><span class="tag">'+(p.category||'—')+'</span></td>'+
+      '<td><strong>$ '+parseFloat(p.price||0).toFixed(2).replace('.',',')+'</strong></td>'+
+      '<td><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"'+(p.active!==false?' checked':'')+' onchange="toggleProd(\''+p.id+'\',this.checked)"><span style="font-size:.8rem;color:#888">'+(p.active!==false?'Activo':'Inactivo')+'</span></label></td>'+
+      '<td><button class="btn-danger" onclick="deleteProd(\''+p.id+'\')">🗑️ Eliminar</button></td>'+
+    '</tr>';
+  }
+  tbody.innerHTML=html;
+}
+
+function toggleProd(id,active){
+  db.collection('products').doc(id).update({active:active}).then(function(){ toast('Producto '+(active?'activado':'desactivado')); });
+}
+function deleteProd(id){
+  if(!confirm('¿Eliminar este producto?')) return;
+  db.collection('products').doc(id).delete().then(function(){ toast('¡Producto eliminado!'); });
+}
+
+// ─── LOGO LISTENER ───────────────────────────────
+function listenLogo(){
+  db.doc('config/logo').onSnapshot(function(snap){
+    if(snap.exists){ currentLogoUrl=snap.data().url||''; renderLogo(currentLogoUrl); }
+  });
+}
+
+// ─── RULETA ADMIN ────────────────────────────────
+var ruletaCfg = { enabled: false };
+
+function setupRuleta(){
+  db.doc('config/ruleta').onSnapshot(function(snap){
+    ruletaCfg.enabled = snap.exists && snap.data().enabled === true;
+    document.getElementById('btn-ruleta-on').classList.toggle('active', ruletaCfg.enabled);
+    document.getElementById('btn-ruleta-off').classList.toggle('active', !ruletaCfg.enabled);
+  });
+  document.getElementById('btn-ruleta-on').onclick  = function(){ ruletaCfg.enabled=true;  updateRuletaBtns(); };
+  document.getElementById('btn-ruleta-off').onclick = function(){ ruletaCfg.enabled=false; updateRuletaBtns(); };
+  document.getElementById('btn-save-ruleta').onclick = saveRuletaConfig;
+}
+
+function updateRuletaBtns(){
+  document.getElementById('btn-ruleta-on').classList.toggle('active', ruletaCfg.enabled);
+  document.getElementById('btn-ruleta-off').classList.toggle('active', !ruletaCfg.enabled);
+}
+
+function saveRuletaConfig(){
+  db.doc('config/ruleta').set({
+    enabled: ruletaCfg.enabled,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){ toast('¡Configuración de ruleta guardada!'); });
+}
+
+function renderRuletaProducts(){
+  var el = document.getElementById('ruleta-products-list');
+  if(!el) return;
+  if(!allProds.length){ el.innerHTML='<p style="color:#888;font-size:.875rem">No hay productos registrados.</p>'; return; }
+  var html = '<div style="display:flex;flex-direction:column;gap:10px">';
+  for(var i=0;i<allProds.length;i++){
+    var p = allProds[i];
+    var checked = p.ruletaEnabled ? 'checked' : '';
+    var pctVal  = p.ruletaPct || 10;
+    html +=
+      '<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:var(--r2);flex-wrap:wrap">'+
+        '<img src="'+(p.imageUrl||'')+'" style="width:52px;height:52px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.src=\'https://placehold.co/52x52/eee/999?text=?\'">'+
+        '<div style="flex:1;min-width:100px">'+
+          '<div style="font-weight:800;color:var(--azul);font-size:.88rem">'+(p.name||'')+'</div>'+
+          '<div style="color:var(--cinza);font-size:.8rem">$ '+parseFloat(p.price||0).toFixed(2).replace('.',',')+'</div>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
+          '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;font-size:.83rem;color:var(--verde)">'+
+            '<input type="checkbox" '+checked+' onchange="toggleRuletaProd(\''+p.id+'\',this.checked)" style="width:17px;height:17px;cursor:pointer">'+
+            'Ruleta'+
+          '</label>'+
+          '<select onchange="saveRuletaPct(\''+p.id+'\',this.value)" style="padding:5px 8px;border:2px solid #ddd;border-radius:6px;font-family:Nunito,sans-serif;font-size:.82rem;cursor:pointer">'+
+            '<option value="5"'+(pctVal==5?' selected':'')+'>5%</option>'+
+            '<option value="10"'+(pctVal==10?' selected':'')+'>10%</option>'+
+            '<option value="15"'+(pctVal==15?' selected':'')+'>15%</option>'+
+            '<option value="20"'+(pctVal==20?' selected':'')+'>20%</option>'+
+          '</select>'+
+        '</div>'+
+      '</div>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function toggleRuletaProd(id, enabled){
+  db.collection('products').doc(id).update({ ruletaEnabled: enabled })
+    .then(function(){ toast(enabled?'¡Ruleta activada para este producto!':'Ruleta desactivada'); });
+}
+
+function saveRuletaPct(id, pct){
+  db.collection('products').doc(id).update({ ruletaPct: parseInt(pct) })
+    .then(function(){ toast('¡Descuento actualizado: '+pct+'%!'); });
+}
+
+// ─── INIT ────────────────────────────────────────
+function initAdmin(){
+  setupLogoUpload();
+  setupStatus();
+  setupSlides();
+  setupProducts();
+  setupRuleta();
+  listenLogo();
+  listenSlides();
+  listenProducts();
+}
+
+</script>
+</body>
+</html>

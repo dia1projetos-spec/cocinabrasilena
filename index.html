@@ -112,9 +112,7 @@
           <input id="f-calle" type="text" placeholder="Calle / Avenida">
           <input id="f-num" type="text" placeholder="Número">
         </div>
-        <div style="margin-top:8px">
-          <input id="f-barrio" type="text" placeholder="Barrio">
-        </div>
+        <div style="margin-top:8px"><input id="f-barrio" type="text" placeholder="Barrio"></div>
       </div>
     </div>
     <div class="modal-ft">
@@ -139,7 +137,7 @@
 <div id="ruleta-modal">
   <div class="ruleta-box">
     <h2>🎰 ¡Girá la ruleta!</h2>
-    <p>Agregaste <strong id="ruleta-prod-name"></strong>.<br>¡Girá y ganá un descuento especial!</p>
+    <p id="ruleta-sub">¡Girá y ganá un descuento especial!</p>
     <canvas id="ruleta-canvas" width="240" height="240"></canvas>
     <div class="ruleta-pointer"></div>
     <div class="ruleta-resultado" id="ruleta-resultado">
@@ -154,9 +152,6 @@
 <!-- TOASTS -->
 <div id="toasts"></div>
 
-<!-- ══════════════════════════════════════
-     FIREBASE + LÓGICA (sin módulos)
-══════════════════════════════════════ -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
@@ -172,196 +167,51 @@ firebase.initializeApp({
 });
 var db = firebase.firestore();
 
-// ─── RULETA ─────────────────────────────────────
-var ruletaGlobalEnabled = false;
-var ruletaUsada         = false; // una sola vez por visita
-var ruletaPendingPct    = 10;    // % del producto actual
-var ruletaPendingProduct = null;
+// ─── ESTADO GLOBAL ──────────────────────────────
+var allProducts      = [];
+var activeCat        = 'todos';
+var slides           = [];
+var curSlide         = 0;
+var sliderTimer;
+var cart             = [];
+var ruletaEnabled    = false;   // activado desde Firebase
+var ruletaUsada      = false;   // solo una vez por visita
+var ruletaPendingPct = 10;
+var ruletaPendingId  = null;    // id del producto en el carrito
+var ruletaPendingName= '';
 
-function listenRuleta(){
-  db.doc('config/ruleta').onSnapshot(function(snap){
-    ruletaGlobalEnabled = snap.exists && snap.data().enabled === true;
-  });
-}
-
-// Dibuja la ruleta con los 4 valores reales: 5%, 10%, 15%, 20%
-// Los segmentos se repiten 2 veces cada uno (8 en total) para que se vea más vistosa
-// Orden fijo: 5, 15, 20, 10, 5, 15, 20, 10  (mezclados para parecer aleatorio)
-var RULETA_LABELS = ['5%','15%','20%','10%','5%','15%','20%','10%'];
-var RULETA_COLORS = ['#009C3B','#002776','#c0392b','#1a3a8a','#27ae60','#1a5c8a','#e74c3c','#002776'];
-var RULETA_SEGS   = 8;
-
-function drawRuleta(angle){
-  var canvas = document.getElementById('ruleta-canvas');
-  if(!canvas) return;
-  var ctx = canvas.getContext('2d');
-  var cx=120, cy=120, r=108;
-  var seg = (Math.PI*2) / RULETA_SEGS;
-  ctx.clearRect(0,0,240,240);
-
-  for(var i=0;i<RULETA_SEGS;i++){
-    var s = angle + i*seg;
-    var e = s + seg;
-    // Sector
-    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,s,e); ctx.closePath();
-    ctx.fillStyle = RULETA_COLORS[i]; ctx.fill();
-    ctx.strokeStyle='#fff'; ctx.lineWidth=2.5; ctx.stroke();
-    // Texto
-    ctx.save();
-    ctx.translate(cx,cy);
-    ctx.rotate(s + seg/2);
-    ctx.textAlign='right';
-    ctx.fillStyle='#fff';
-    ctx.font='bold 15px Nunito,Arial,sans-serif';
-    ctx.shadowColor='rgba(0,0,0,0.4)';
-    ctx.shadowBlur=3;
-    ctx.fillText(RULETA_LABELS[i], r-10, 5);
-    ctx.restore();
-  }
-  // Borde exterior
-  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-  ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=3; ctx.stroke();
-  // Centro dorado
-  ctx.beginPath(); ctx.arc(cx,cy,20,0,Math.PI*2);
-  ctx.fillStyle='#FFDF00'; ctx.fill();
-  ctx.strokeStyle='#fff'; ctx.lineWidth=2.5; ctx.stroke();
-  // Estrellita en centro
-  ctx.fillStyle='#002776';
-  ctx.font='bold 14px Arial';
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.fillText('★', cx, cy);
-}
-
-// Calcula el ángulo necesario para que el puntero (arriba, -π/2) apunte al segmento del %
-function calcAngleForPct(pct){
-  // Posición del label en RULETA_LABELS (usa el primer que coincida)
-  var targetIdx = 0;
-  var target = pct + '%';
-  for(var i=0;i<RULETA_LABELS.length;i++){
-    if(RULETA_LABELS[i] === target){ targetIdx = i; break; }
-  }
-  var seg = (Math.PI*2) / RULETA_SEGS;
-  // El puntero apunta hacia arriba = -PI/2
-  // El centro del segmento targetIdx está en: targetIdx*seg + seg/2
-  // Para que ese centro quede arriba, la rotación de la ruleta debe ser:
-  // angle = -PI/2 - (targetIdx*seg + seg/2)
-  // Normalizamos a positivo
-  var angle = -Math.PI/2 - (targetIdx * seg + seg/2);
-  // Asegurar positivo
-  while(angle < 0) angle += Math.PI*2;
-  return angle;
-}
-
-function tryOpenRuleta(id, name, price, img){
-  if(!ruletaGlobalEnabled) return;
-  if(ruletaUsada) return;
-
-  var prod = null;
-  for(var i=0;i<allProducts.length;i++){
-    if(allProducts[i].id===id){ prod=allProducts[i]; break; }
-  }
-  if(!prod || !prod.ruletaEnabled) return;
-
-  ruletaPendingPct = parseInt(prod.ruletaPct) || 10;
-  ruletaPendingProduct = {id:id, name:name, price:price, img:img};
-
-  // Reset UI
-  document.getElementById('ruleta-resultado').style.display='none';
-  var btnG=document.getElementById('btn-girar');
-  btnG.disabled=false; btnG.textContent='🎡 ¡Girar!'; btnG.onclick=girarRuleta;
-  document.getElementById('btn-no-gracias').style.display='';
-  document.getElementById('ruleta-prod-name').textContent=name;
-  document.getElementById('ruleta-desc-pct').textContent='un descuento especial';
-
-  drawRuleta(0);
-  document.getElementById('ruleta-modal').classList.add('show');
-  document.body.style.overflow='hidden';
-}
-
-function girarRuleta(){
-  var btn=document.getElementById('btn-girar');
-  btn.disabled=true; btn.textContent='Girando...';
-
-  var pct = ruletaPendingPct;
-  // Ángulo final donde debe parar el segmento ganador
-  var finalAngle = calcAngleForPct(pct);
-  // Muchas vueltas completas + el ángulo final (hace que parezca aleatorio)
-  var vueltas = 8 + Math.floor(Math.random()*3); // 8-10 vueltas
-  var totalRot = (Math.PI*2) * vueltas + finalAngle;
-
-  var duration = 4200;
-  var startTime = null;
-
-  function animate(ts){
-    if(!startTime) startTime=ts;
-    var progress = Math.min((ts-startTime)/duration, 1);
-    // easeOut cúbico — desacelera gradualmente, muy natural
-    var ease = 1 - Math.pow(1-progress, 4);
-    drawRuleta(ease * totalRot);
-    if(progress < 1){
-      requestAnimationFrame(animate);
-    } else {
-      drawRuleta(totalRot); // dibuja posición exacta final
-      mostrarResultadoRuleta();
-    }
-  }
-  requestAnimationFrame(animate);
-}
-
-function mostrarResultadoRuleta(){
-  var pct=ruletaPendingPct;
-  document.getElementById('ruleta-pct').textContent='🎉 ¡'+pct+'% de descuento!';
-  document.getElementById('ruleta-txt').textContent='¡Tu precio ya bajó en el carrito!';
-  document.getElementById('ruleta-resultado').style.display='block';
-  var btn=document.getElementById('btn-girar');
-  btn.textContent='¡Listo!'; btn.disabled=false;
-  btn.onclick=function(){ aplicarDescuentoRuleta(pct); };
-  document.getElementById('btn-no-gracias').style.display='none';
-  ruletaUsada=true;
-}
-
-function aplicarDescuentoRuleta(pct){
-  if(!ruletaPendingProduct){ cerrarRuleta(); return; }
-  var p=ruletaPendingProduct;
-  var newPrice=+(p.price*(1-pct/100)).toFixed(2);
-  for(var i=0;i<cart.length;i++){
-    if(cart[i].id===p.id){ cart[i].price=newPrice; cart[i].descuento=pct; break; }
-  }
-  saveCart(); updateCartUI(); cerrarRuleta();
-  toast('🎉 ¡'+pct+'% aplicado en '+p.name+'!');
-  ruletaPendingProduct=null;
-}
-
-function cerrarRuleta(){
-  document.getElementById('ruleta-modal').classList.remove('show');
-  document.body.style.overflow='';
-  document.getElementById('btn-girar').onclick=girarRuleta;
-}
-
-// ─── CART ───────────────────────────────────────
-var cart = [];
 try{ cart = JSON.parse(localStorage.getItem('cart')||'[]'); }catch(e){}
 
+// ─── CART ───────────────────────────────────────
 function saveCart(){ try{ localStorage.setItem('cart',JSON.stringify(cart)); }catch(e){} }
+function cartTotal(){ var t=0; for(var i=0;i<cart.length;i++) t+=cart[i].price*cart[i].qty; return t; }
+function cartCount(){ var c=0; for(var i=0;i<cart.length;i++) c+=cart[i].qty; return c; }
 
-function cartTotal(){
-  var t=0; for(var i=0;i<cart.length;i++) t+=cart[i].price*cart[i].qty; return t;
-}
-function cartCount(){
-  var c=0; for(var i=0;i<cart.length;i++) c+=cart[i].qty; return c;
-}
+function addToCart(id, name, price, img){
+  // Busca el producto en allProducts para obtener config de ruleta
+  var prod = null;
+  for(var k=0;k<allProducts.length;k++){
+    if(allProducts[k].id===id){ prod=allProducts[k]; break; }
+  }
 
-function addToCart(id,name,price,img){
-  var found=false;
+  // Agrega al carrito
+  var found = false;
   for(var i=0;i<cart.length;i++){
     if(cart[i].id===id){ cart[i].qty++; found=true; break; }
   }
-  if(!found) cart.push({id:id,name:name,price:price,imageUrl:img,qty:1});
-  saveCart(); updateCartUI();
+  if(!found) cart.push({id:id, name:name, price:parseFloat(price), imageUrl:img, qty:1});
+  saveCart();
+  updateCartUI();
   toast('🛒 ¡'+name+' agregado!');
-  // Intentar abrir ruleta (solo si está habilitada y no se usó)
-  tryOpenRuleta(id,name,price,img);
+
+  // ¿Mostrar ruleta?
+  // Condiciones: ruleta global activa + producto con ruleta + cliente no giró todavía + primera vez que agrega este producto
+  if(ruletaEnabled && !ruletaUsada && prod && prod.ruletaEnabled && !found){
+    ruletaPendingPct  = parseInt(prod.ruletaPct) || 10;
+    ruletaPendingId   = id;
+    ruletaPendingName = name;
+    setTimeout(function(){ abrirRuleta(); }, 400); // pequeño delay para que el toast aparezca primero
+  }
 }
 
 function removeItem(id){
@@ -384,25 +234,23 @@ function updateCartUI(){
   var count=cartCount();
   var badge=document.getElementById('cart-badge');
   if(badge){ badge.textContent=count; badge.className='cart-badge'+(count>0?' show':''); }
-
   var body=document.getElementById('cart-body');
   var totalEl=document.getElementById('cart-total');
   if(!body) return;
-
   if(!cart.length){
     body.innerHTML='<div class="cart-empty"><div class="ei">🍽️</div><p>Tu carrito está vacío</p></div>';
     if(totalEl) totalEl.textContent='$ 0,00';
     return;
   }
-
   var html='';
   for(var i=0;i<cart.length;i++){
     var it=cart[i];
-    var sid=it.id.replace(/'/g,"\\'");
+    var sid=it.id.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var label = it.descuento ? it.name+' <span style="color:var(--verde);font-size:.78rem;font-weight:800">−'+it.descuento+'%</span>' : it.name;
     html+='<div class="cart-item">'+
-      '<img src="'+(it.imageUrl||'')+'" alt="'+it.name+'" onerror="this.style.display=\'none\'">'+
+      '<img src="'+(it.imageUrl||'')+'" alt="" onerror="this.style.display=\'none\'">'+
       '<div class="ci-info">'+
-        '<div class="ci-name">'+it.name+'</div>'+
+        '<div class="ci-name">'+label+'</div>'+
         '<div class="ci-price">$ '+(it.price*it.qty).toFixed(2).replace('.',',')+'</div>'+
         '<div class="ci-ctrl">'+
           '<button class="qty-btn" onclick="changeQty(\''+sid+'\',-1)">−</button>'+
@@ -417,7 +265,6 @@ function updateCartUI(){
   if(totalEl) totalEl.textContent='$ '+cartTotal().toFixed(2).replace('.',',');
 }
 
-// ─── CART DRAWER ────────────────────────────────
 function openCart(){
   document.getElementById('cart-drawer').classList.add('show');
   document.getElementById('cart-overlay').classList.add('show');
@@ -426,6 +273,126 @@ function openCart(){
 function closeCart(){
   document.getElementById('cart-drawer').classList.remove('show');
   document.getElementById('cart-overlay').classList.remove('show');
+  document.body.style.overflow='';
+}
+
+// ─── RULETA ─────────────────────────────────────
+// 8 segmentos con los 4 valores reales repetidos y mezclados
+var R_LABELS = ['5%','15%','20%','10%','5%','15%','20%','10%'];
+var R_COLORS = ['#009C3B','#002776','#c0392b','#1a3a8a','#27ae60','#1a5276','#e74c3c','#154360'];
+var R_SEGS   = 8;
+
+function drawRuleta(angle){
+  var cv = document.getElementById('ruleta-canvas');
+  if(!cv) return;
+  var ctx=cv.getContext('2d'), cx=120, cy=120, r=108;
+  var seg=(Math.PI*2)/R_SEGS;
+  ctx.clearRect(0,0,240,240);
+  for(var i=0;i<R_SEGS;i++){
+    var s=angle+i*seg, e=s+seg;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,s,e); ctx.closePath();
+    ctx.fillStyle=R_COLORS[i]; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    ctx.save();
+    ctx.translate(cx,cy); ctx.rotate(s+seg/2);
+    ctx.textAlign='right'; ctx.fillStyle='#fff';
+    ctx.font='bold 15px Arial,sans-serif';
+    ctx.fillText(R_LABELS[i], r-10, 6);
+    ctx.restore();
+  }
+  // Aro exterior
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=4; ctx.stroke();
+  // Centro
+  ctx.beginPath(); ctx.arc(cx,cy,18,0,Math.PI*2);
+  ctx.fillStyle='#FFDF00'; ctx.fill();
+  ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle='#002776'; ctx.font='bold 13px Arial';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('★',cx,cy);
+}
+
+// Calcula el ángulo para que el puntero (top center) apunte al segmento del %
+function anglePara(pct){
+  var target=pct+'%', idx=0;
+  for(var i=0;i<R_LABELS.length;i++){ if(R_LABELS[i]===target){ idx=i; break; } }
+  var seg=(Math.PI*2)/R_SEGS;
+  // Puntero en -PI/2 (top). Centro del segmento idx = idx*seg + seg/2
+  // Necesitamos: angle + idx*seg + seg/2 = -PI/2  =>  angle = -PI/2 - idx*seg - seg/2
+  var a = -Math.PI/2 - idx*seg - seg/2;
+  // Normalizar a [0, 2PI]
+  a = a % (Math.PI*2);
+  if(a < 0) a += Math.PI*2;
+  return a;
+}
+
+function abrirRuleta(){
+  // Reset visual
+  document.getElementById('ruleta-resultado').style.display='none';
+  var btnG=document.getElementById('btn-girar');
+  btnG.textContent='🎡 ¡Girar!'; btnG.disabled=false; btnG.onclick=iniciarGiro;
+  document.getElementById('btn-no-gracias').style.display='';
+  document.getElementById('ruleta-sub').textContent='Agregaste '+ruletaPendingName+'. ¡Girá y ganá un descuento!';
+  drawRuleta(0);
+  document.getElementById('ruleta-modal').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+
+function iniciarGiro(){
+  var btn=document.getElementById('btn-girar');
+  btn.disabled=true; btn.textContent='Girando...';
+
+  var finalAngle = anglePara(ruletaPendingPct);
+  var vueltas    = 8 + Math.floor(Math.random()*3); // 8-10 vueltas, parece aleatorio
+  var totalRot   = (Math.PI*2)*vueltas + finalAngle;
+  var duration   = 4000;
+  var start      = null;
+
+  function step(ts){
+    if(!start) start=ts;
+    var p = Math.min((ts-start)/duration, 1);
+    var ease = 1 - Math.pow(1-p, 4); // easeOutQuart
+    drawRuleta(ease*totalRot);
+    if(p<1){ requestAnimationFrame(step); }
+    else { drawRuleta(totalRot); terminarGiro(); }
+  }
+  requestAnimationFrame(step);
+}
+
+function terminarGiro(){
+  var pct = ruletaPendingPct;
+  document.getElementById('ruleta-pct').textContent='🎉 ¡'+pct+'% de descuento!';
+  document.getElementById('ruleta-txt').textContent='El precio bajó en tu carrito';
+  document.getElementById('ruleta-resultado').style.display='block';
+  var btn=document.getElementById('btn-girar');
+  btn.textContent='¡Genial, aplicar descuento!';
+  btn.disabled=false;
+  btn.onclick=function(){ aplicarDescuento(pct); };
+  document.getElementById('btn-no-gracias').style.display='none';
+  ruletaUsada=true;
+  // Aplica el descuento en el carrito
+  aplicarDescuento(pct);
+}
+
+function aplicarDescuento(pct){
+  var id=ruletaPendingId;
+  for(var i=0;i<cart.length;i++){
+    if(cart[i].id===id){
+      // Solo aplica si no tiene descuento ya
+      if(!cart[i].descuento){
+        cart[i].price = +(cart[i].price*(1-pct/100)).toFixed(2);
+        cart[i].descuento = pct;
+      }
+      break;
+    }
+  }
+  saveCart(); updateCartUI();
+  cerrarRuleta();
+  toast('🎉 ¡'+pct+'% aplicado en '+ruletaPendingName+'!');
+}
+
+function cerrarRuleta(){
+  document.getElementById('ruleta-modal').classList.remove('show');
   document.body.style.overflow='';
 }
 
@@ -447,9 +414,6 @@ function toast(msg){
 }
 
 // ─── PRODUCTS ───────────────────────────────────
-var allProducts=[];
-var activeCat='todos';
-
 function renderProducts(list){
   var g=document.getElementById('products-grid');
   if(!g) return;
@@ -461,15 +425,15 @@ function renderProducts(list){
   for(var i=0;i<list.length;i++){
     var p=list[i];
     var price=parseFloat(p.price)||0;
-    // Escapa comillas simples para el onclick
     var eid=(p.id||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    var ename=(p.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var ename=(p.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
     var eimg=(p.imageUrl||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     html+=
       '<div class="product-card">'+
         '<div class="prod-img" onclick="openLightbox(\''+eimg+'\')">'+
-          '<img src="'+(p.imageUrl||'')+'" alt="'+(p.name||'')+'" loading="lazy" onerror="this.src=\'https://placehold.co/400x300/eee/999?text=Foto\'">'+
+          '<img src="'+(p.imageUrl||'')+'" alt="'+ename+'" loading="lazy" onerror="this.src=\'https://placehold.co/400x300/eee/999?text=Foto\'">'+
           (p.badge?'<span class="prod-badge">'+p.badge+'</span>':'')+
+          (p.ruletaEnabled?'<span class="prod-badge" style="left:auto;right:10px;background:#c0392b">🎰</span>':'')+
         '</div>'+
         '<div class="prod-info">'+
           '<div class="prod-name">'+(p.name||'')+'</div>'+
@@ -495,8 +459,7 @@ function buildCats(products){
   var html='';
   for(var j=0;j<cats.length;j++){
     var c=cats[j];
-    var label=c==='todos'?'Todos':c.charAt(0).toUpperCase()+c.slice(1);
-    html+='<button class="cat-btn'+(c===activeCat?' active':'')+'" onclick="filterCat(\''+c+'\')">'+label+'</button>';
+    html+='<button class="cat-btn'+(c===activeCat?' active':'')+'" onclick="filterCat(\''+c+'\')">'+(c==='todos'?'Todos':c.charAt(0).toUpperCase()+c.slice(1))+'</button>';
   }
   bar.innerHTML=html;
 }
@@ -504,14 +467,12 @@ function buildCats(products){
 function filterCat(cat){
   activeCat=cat;
   var btns=document.querySelectorAll('.cat-btn');
-  for(var i=0;i<btns.length;i++) btns[i].classList.toggle('active',btns[i].textContent.trim()===(cat==='todos'?'Todos':cat.charAt(0).toUpperCase()+cat.slice(1)));
+  for(var i=0;i<btns.length;i++) btns[i].classList.toggle('active',btns[i].getAttribute('onclick')==="filterCat('"+cat+"')");
   var list=cat==='todos'?allProducts:allProducts.filter(function(p){ return p.category===cat; });
   renderProducts(list);
 }
 
 // ─── SLIDER ─────────────────────────────────────
-var slides=[]; var curSlide=0; var sliderTimer;
-
 function initSlider(data){
   slides=data.length?data:[{imageUrl:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200'}];
   var track=document.getElementById('slides-track');
@@ -528,15 +489,13 @@ function initSlider(data){
   }
   goSlide(0); restartTimer();
 }
-
 function goSlide(n){
   curSlide=((n%slides.length)+slides.length)%slides.length;
-  var track=document.getElementById('slides-track');
-  if(track) track.style.transform='translateX(-'+(curSlide*100)+'%)';
+  var t=document.getElementById('slides-track');
+  if(t) t.style.transform='translateX(-'+(curSlide*100)+'%)';
   var dots=document.querySelectorAll('.dot');
   for(var i=0;i<dots.length;i++) dots[i].classList.toggle('active',i===curSlide);
 }
-
 function restartTimer(){ clearInterval(sliderTimer); sliderTimer=setInterval(function(){ goSlide(curSlide+1); },5000); }
 
 // ─── STATUS ─────────────────────────────────────
@@ -552,15 +511,13 @@ function initLoading(){
   var screen=document.getElementById('loading');
   var bar=document.getElementById('load-bar');
   if(!screen) return;
-  var pct=0; var steps=[15,20,15,20,15,15]; var si=0;
+  var pct=0, steps=[15,20,15,20,15,15], si=0;
   function tick(){
     if(si>=steps.length){
       if(bar) bar.style.width='100%';
       setTimeout(function(){
         screen.classList.add('out');
-        setTimeout(function(){
-          screen.style.display='none';
-        },900);
+        setTimeout(function(){ screen.style.display='none'; },900);
       },300);
       return;
     }
@@ -569,7 +526,6 @@ function initLoading(){
     setTimeout(tick,280+Math.random()*180);
   }
   setTimeout(tick,300);
-  // Fallback
   setTimeout(function(){ screen.style.display='none'; },7000);
 }
 
@@ -587,22 +543,29 @@ function initHam(){
   for(var i=0;i<links.length;i++) links[i].onclick=closeNav;
 }
 
-// ─── FIREBASE LISTENERS ─────────────────────────
+// ─── FIREBASE ───────────────────────────────────
 function startFirebase(){
-  listenRuleta();
+  // Ruleta config
+  db.doc('config/ruleta').onSnapshot(function(snap){
+    ruletaEnabled = snap.exists && snap.data().enabled===true;
+  });
+  // Products
   db.collection('products').onSnapshot(function(snap){
     allProducts=snap.docs.map(function(d){ var o=d.data(); o.id=d.id; return o; })
       .filter(function(p){ return p.active!==false; });
     buildCats(allProducts); filterCat(activeCat);
   });
+  // Slides
   db.collection('slides').onSnapshot(function(snap){
     var data=snap.docs.map(function(d){ var o=d.data(); o.id=d.id; return o; })
       .sort(function(a,b){ return (a.order||0)-(b.order||0); });
     initSlider(data);
   });
+  // Status
   db.doc('config/status').onSnapshot(function(snap){
     if(snap.exists) setStatus(snap.data().status,snap.data().message);
   });
+  // Logo
   db.doc('config/logo').onSnapshot(function(snap){
     if(snap.exists&&snap.data().url){
       var img=document.getElementById('logo-img');
@@ -621,7 +584,9 @@ function sendOrder(){
   if(!nombre||!wpp||!calle||!num||!barrio){ toast('⚠️ ¡Completá todos los campos!'); return; }
   var total=cartTotal().toFixed(2).replace('.',',');
   var items='';
-  for(var i=0;i<cart.length;i++) items+='• '+cart[i].name+' x'+cart[i].qty+' — $'+(cart[i].price*cart[i].qty).toFixed(2).replace('.',',')+'\n';
+  for(var i=0;i<cart.length;i++){
+    items+='• '+cart[i].name+(cart[i].descuento?' (−'+cart[i].descuento+'%)':'')+' x'+cart[i].qty+' — $'+(cart[i].price*cart[i].qty).toFixed(2).replace('.',',')+'\n';
+  }
   var msg=encodeURIComponent('🇧🇷 *Cocina Brasileña — Nuevo Pedido*\n\n👤 *Cliente:* '+nombre+'\n📱 *WhatsApp:* '+wpp+'\n📍 *Dirección:* '+calle+' '+num+', '+barrio+'\n\n📋 *Productos:*\n'+items+'\n💰 *Total: $'+total+'*');
   window.open('https://wa.me/5513981763452?text='+msg,'_blank');
   cart=[]; saveCart(); updateCartUI();
@@ -629,19 +594,17 @@ function sendOrder(){
   toast('✅ ¡Pedido enviado!');
 }
 
-// ─── MAIN ───────────────────────────────────────
+// ─── INIT ───────────────────────────────────────
 window.onload=function(){
   initLoading();
   initHam();
   updateCartUI();
   startFirebase();
 
-  // Carrito
   document.getElementById('btn-cart').onclick=openCart;
   document.getElementById('cart-close').onclick=closeCart;
   document.getElementById('cart-overlay').onclick=closeCart;
 
-  // Checkout
   document.getElementById('btn-checkout').onclick=function(){
     if(!cart.length){ toast('⚠️ ¡Agregá productos al carrito!'); return; }
     closeCart();
@@ -652,17 +615,14 @@ window.onload=function(){
   };
   document.getElementById('btn-send').onclick=sendOrder;
 
-  // Slider
   document.getElementById('btn-prev').onclick=function(){ goSlide(curSlide-1); restartTimer(); };
   document.getElementById('btn-next').onclick=function(){ goSlide(curSlide+1); restartTimer(); };
 
-  // Lightbox
   document.getElementById('lb-close').onclick=closeLightbox;
   document.getElementById('lightbox').onclick=function(e){ if(e.target===this) closeLightbox(); };
 
-  // Ruleta
-  document.getElementById('btn-girar').onclick = girarRuleta;
-  document.getElementById('btn-no-gracias').onclick = cerrarRuleta;
+  document.getElementById('btn-girar').onclick=iniciarGiro;
+  document.getElementById('btn-no-gracias').onclick=cerrarRuleta;
 };
 </script>
 </body>
